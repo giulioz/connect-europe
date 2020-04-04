@@ -1,0 +1,4 @@
+{
+  "*.{ts,tsx,js,jsx}": ["prettier --list-different --write", "eslint --fix"],
+  "*.{md,html,css}": ["prettier --list-different --write"]
+}

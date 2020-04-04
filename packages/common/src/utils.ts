@@ -1,0 +1,27 @@
+import Endpoints from "./Endpoints";
+
+export type ParamsType<K extends keyof Endpoints> = Endpoints[K]["params"];
+export type ResType<K extends keyof Endpoints> = Endpoints[K]["res"];
+export type ReqType<K extends keyof Endpoints> = Endpoints[K]["req"];
+
+// TODO: This needs some testing...
+export function withParameters<K extends keyof Endpoints>(
+  endpoint: K,
+  params: ParamsType<K>
+) {
+  const url = endpoint.split(" ").slice(1).join(" ");
+
+  return url
+    .split("/")
+    .map((part) => {
+      if (part.startsWith(":")) {
+        return params[part.substring(1) as keyof ParamsType<K>];
+      } else {
+        return part;
+      }
+    })
+    .join("/");
+}
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
