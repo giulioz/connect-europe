@@ -5,6 +5,8 @@ import { MuiThemeProvider, createMuiTheme } from "@material-ui/core";
 
 import Game from "./pages/Game";
 
+import "./globalStyles.css";
+
 const theme = (createMuiTheme as any)({
   palette: {
     type: "dark",

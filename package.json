@@ -39,5 +39,8 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@vx/responsive": "^0.0.195"
+  }
 }
