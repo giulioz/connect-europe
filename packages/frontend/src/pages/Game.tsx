@@ -56,6 +56,7 @@ const useStyles = makeStyles(theme => ({
   cityName: {
     fill: theme.palette.common.white,
     textAnchor: "middle",
+    font: `20px sans-serif`,
   },
 }));
 
@@ -91,7 +92,7 @@ const GameBoard = withParentSize(function GameBoard({
         />
       ))}
 
-      {cities.map(({ name, color, position: [x, y] }) => (
+      {cities.map(({ name, color, position: [x, y], textWidth }) => (
         <>
           <image
             {...calcPos(x, y)}
@@ -101,16 +102,21 @@ const GameBoard = withParentSize(function GameBoard({
               2})`}
             href={`${process.env.PUBLIC_URL}/${color}.png`}
           ></image>
-          <g transform={`translate(-50,${cityBulletSize / 2})`}>
-            <rect {...calcPos(x, y)} fill="green" width={100} height={32} />
-            <text
-              className={classes.cityName}
-              transform={`translate(0,16)`}
-              {...calcPos(x, y)}
-            >
-              {name.toUpperCase()}
-            </text>
-          </g>
+          <rect
+            {...calcPos(x, y)}
+            transform={`translate(${-(textWidth + 8)},${cityBulletSize / 2})`}
+            fill="green"
+            width={textWidth * 2 + 16}
+            height={32}
+            opacity={0.5}
+          />
+          <text
+            {...calcPos(x, y)}
+            transform={`translate(0,${cityBulletSize / 2 + 24})`}
+            className={classes.cityName}
+          >
+            {name.toUpperCase()}
+          </text>
         </>
       ))}
     </svg>
