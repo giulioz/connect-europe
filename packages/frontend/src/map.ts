@@ -1,3 +1,49 @@
+export type CityColors = "blue" | "red" | "green" | "orange" | "yellow";
+
+export type City = {
+  name: string;
+  position: [number, number];
+  color: CityColors;
+};
+
+export const cities: City[] = [
+  { name: "glasgow", position: [9, 0], color: "yellow" },
+  { name: "oslo", position: [15, 0], color: "yellow" },
+  { name: "stockholm", position: [19, 0], color: "yellow" },
+  { name: "helsinky", position: [23, 0], color: "yellow" },
+  { name: "st. peterburg", position: [27, 0], color: "yellow" },
+  { name: "moskva", position: [31, 2], color: "yellow" },
+  { name: "malmo", position: [17, 2], color: "yellow" },
+  { name: "dublin", position: [5, 2], color: "red" },
+  { name: "london", position: [8, 3], color: "red" },
+  { name: "playmouth", position: [3, 4], color: "red" },
+  { name: "brest", position: [2, 5], color: "red" },
+  { name: "bilbao", position: [3, 8], color: "red" },
+  { name: "madrid", position: [1, 10], color: "red" },
+  { name: "barcelona", position: [6, 11], color: "red" },
+  { name: "amsterdam", position: [11, 4], color: "orange" },
+  { name: "paris", position: [9, 6], color: "orange" },
+  { name: "berlin", position: [16, 5], color: "orange" },
+  { name: "zurich", position: [13, 8], color: "orange" },
+  { name: "wien", position: [17, 8], color: "orange" },
+  { name: "budapest", position: [21, 8], color: "orange" },
+  { name: "warszawa", position: [22, 5], color: "orange" },
+  { name: "riga", position: [24, 1], color: "green" },
+  { name: "vilnius", position: [24, 3], color: "green" },
+  { name: "minsk", position: [27, 4], color: "green" },
+  { name: "kyiv", position: [29, 6], color: "green" },
+  { name: "charkiv", position: [32, 7], color: "green" },
+  { name: "odessa", position: [30, 9], color: "green" },
+  { name: "bucaresti", position: [27, 10], color: "green" },
+  { name: "sofia", position: [24, 11], color: "blue" },
+  { name: "thessaloniki", position: [24, 13], color: "blue" },
+  { name: "istanbul", position: [27, 12], color: "blue" },
+  { name: "tirana", position: [19, 12], color: "blue" },
+  { name: "roma", position: [15, 12], color: "blue" },
+  { name: "firenze", position: [13, 10], color: "blue" },
+  { name: "marseille", position: [9, 10], color: "blue" },
+];
+
 export const points: [number, number][] = [
   [5, 0],
   [7, 0],
