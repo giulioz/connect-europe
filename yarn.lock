@@ -2936,6 +2936,7 @@ __metadata:
     eslint-config-react-app: ^5.2.1
     eslint-import-resolver-node: ^0.3.3
     eslint-plugin-prettier: ^3.1.2
+    hooks.macro: ^1.1.1
     lint-staged: ^10.0.8
     prettier: ^1.19.1
     react: ^16.13.0
@@ -4397,7 +4398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-macros@npm:2.8.0":
+"babel-plugin-macros@npm:2.8.0, babel-plugin-macros@npm:^2.8.0":
   version: 2.8.0
   resolution: "babel-plugin-macros@npm:2.8.0"
   dependencies:
@@ -8999,6 +9000,18 @@ fsevents@^1.2.7:
   dependencies:
     react-is: ^16.7.0
   checksum: 2/d3e3791d6e3a2741ce0ba38e878081dec49247ef22982a990c80941ee1f564ef16cd5a511bcc8c5e54f1ce8205535e0414ca5feea722c0690c80040be7ebf9df
+  languageName: node
+  linkType: hard
+
+"hooks.macro@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "hooks.macro@npm:1.1.1"
+  dependencies:
+    "@babel/helper-module-imports": ^7.8.3
+    babel-plugin-macros: ^2.8.0
+  peerDependencies:
+    react: ^16.8.0
+  checksum: 2/0223f69f9a0a7c4eefb79d1c0ab373e045f7f2fb23343ba0b4ef973a0035724d3d1f896e3637230c1b799c334240ba2d5de64fb4d06123ae3bb17643871281e1
   languageName: node
   linkType: hard
 

@@ -1,4 +1,11 @@
 export type CityColors = "blue" | "red" | "green" | "orange" | "yellow";
+export const cityColorsArray: CityColors[] = [
+  "blue",
+  "red",
+  "green",
+  "orange",
+  "yellow",
+];
 
 export type City = {
   name: string;
@@ -11,7 +18,7 @@ export const cities: City[] = [
   { name: "glasgow", position: [9, 0], color: "yellow", textWidth: 52 },
   { name: "oslo", position: [15, 0], color: "yellow", textWidth: 29 },
   { name: "stockholm", position: [19, 0], color: "yellow", textWidth: 64 },
-  { name: "helsinky", position: [23, 0], color: "yellow", textWidth: 50 },
+  { name: "helsinki", position: [23, 0], color: "yellow", textWidth: 50 },
   { name: "st. peterburg", position: [27, 0], color: "yellow", textWidth: 80 },
   { name: "moskva", position: [31, 2], color: "yellow", textWidth: 43 },
   { name: "malmo", position: [17, 2], color: "yellow", textWidth: 38 },

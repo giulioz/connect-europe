@@ -21,6 +21,7 @@
     "@material-ui/lab": "^4.0.0-alpha.46",
     "@trans-europa/common": "^1.0.0",
     "clsx": "^1.1.0",
+    "hooks.macro": "^1.1.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-router-dom": "^5.1.2",
