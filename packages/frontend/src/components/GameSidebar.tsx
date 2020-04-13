@@ -6,7 +6,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Avatar from "@material-ui/core/Avatar";
-import { deepOrange, yellow, blue, green, red } from "@material-ui/core/colors";
+import { orange, yellow, blue, green, red } from "@material-ui/core/colors";
 
 import { City } from "../map";
 
@@ -36,8 +36,8 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: green[500],
   },
   orangeCityAvatar: {
-    color: theme.palette.getContrastText(deepOrange[500]),
-    backgroundColor: deepOrange[500],
+    color: theme.palette.getContrastText(orange[500]),
+    backgroundColor: orange[500],
   },
   yellowCityAvatar: {
     color: theme.palette.getContrastText(yellow[500]),
