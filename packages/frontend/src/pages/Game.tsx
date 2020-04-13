@@ -8,8 +8,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Layout from "../components/Layout";
 import GameBoard from "../components/GameBoard";
 import GameSidebar from "../components/GameSidebar";
-import { cities, cityColorsArray, City } from "../map";
-import { GameState } from "../gameTypes";
+import { cities, cityColorsArray, City, pointPairs } from "../map";
+import { GameState, Player, BoardPoint } from "../gameTypes";
 
 const SIDENAV_SIZE = 256;
 
@@ -74,7 +74,7 @@ const initialGameState: GameState = {
       targetCities: cityColorsArray.map(
         color => randomPick(cities.filter(city => city.color === color)).name
       ),
-      startingPoint: [9, 8],
+      startingPoint: null,
     },
   ],
   board: [],
@@ -90,25 +90,84 @@ export default function Dashboard() {
     id => cities.find(city => city.name === id) as City
   );
   const startingPoints = useAutoMemo(
-    gameState.players.map(player => ({
-      pos: player.startingPoint,
-      player,
-    }))
-  );
+    gameState.players
+      .map(player => ({
+        pos: player.startingPoint,
+        player,
+      }))
+      .filter(p => p.pos !== null)
+  ) as {
+    pos: BoardPoint;
+    player: Player;
+  }[];
+  const everybodyHasStartingPoint =
+    startingPoints.length === gameState.players.length;
 
   const [placingRailPath, setPlacingRailPath] = useState<
-    [[number, number], [number, number]] | null
+    typeof pointPairs[0] | null
   >(null);
   const [placingStartPiece, setPlacingStartPiece] = useState<
     [number, number] | null
   >(null);
 
-  function handleAddPath() {
-    if (placingRailPath) {
+  function handleBoardClick() {
+    if (
+      gameState.currentState.state === "WaitingForPlayers" &&
+      !myPlayer.startingPoint &&
+      placingStartPiece
+    ) {
       setGameState(state => ({
         ...state,
-        board: [...state.board, placingRailPath],
+        players: state.players.map(player =>
+          player.id === myPlayer.id
+            ? { ...player, startingPoint: placingStartPiece }
+            : player
+        ),
       }));
+      setPlacingStartPiece(null);
+    }
+
+    if (
+      gameState.currentState.state === "Turn" &&
+      gameState.currentState.playerID === myPlayer.id &&
+      placingRailPath
+    ) {
+      if (placingRailPath.double && gameState.currentState.railsLeft >= 2) {
+        setGameState(state => {
+          if (state.currentState.state === "Turn") {
+            return {
+              ...state,
+              board: [
+                ...state.board,
+                [placingRailPath.from, placingRailPath.to],
+              ],
+              currentState: {
+                ...state.currentState,
+                railsLeft: state.currentState.railsLeft - 2,
+              },
+            };
+          }
+          return state;
+        });
+      } else if (gameState.currentState.railsLeft >= 1) {
+        setGameState(state => {
+          if (state.currentState.state === "Turn") {
+            return {
+              ...state,
+              board: [
+                ...state.board,
+                [placingRailPath.from, placingRailPath.to],
+              ],
+              currentState: {
+                ...state.currentState,
+                railsLeft: state.currentState.railsLeft - 1,
+              },
+            };
+          }
+          return state;
+        });
+      }
+
       setPlacingRailPath(null);
     }
   }
@@ -118,19 +177,44 @@ export default function Dashboard() {
     segment,
   }: {
     point: [number, number];
-    segment: [[number, number], [number, number]];
+    segment: typeof pointPairs[0];
   }) {
-    setPlacingRailPath(segment);
-    setPlacingStartPiece(point);
+    if (
+      gameState.currentState.state === "WaitingForPlayers" &&
+      !myPlayer.startingPoint
+    ) {
+      setPlacingStartPiece(point);
+    }
+
+    if (
+      gameState.currentState.state === "Turn" &&
+      gameState.currentState.playerID === myPlayer.id
+    ) {
+      if (segment.double && gameState.currentState.railsLeft >= 2) {
+        setPlacingRailPath(segment);
+      } else if (gameState.currentState.railsLeft >= 1) {
+        setPlacingRailPath(segment);
+      } else {
+        setPlacingRailPath(null);
+      }
+    }
   }
 
   function handleBoardMouseLeave() {
     setPlacingRailPath(null);
+    setPlacingStartPiece(null);
+  }
+
+  function handleStartGame() {
+    setGameState(state => ({
+      ...state,
+      currentState: { state: "Turn", railsLeft: 2, playerID: myPlayer.id },
+    }));
   }
 
   return (
     <Layout>
-      <AppBar position="absolute">
+      <AppBar position="absolute" color="transparent">
         <Toolbar>
           <Typography
             component="h1"
@@ -158,10 +242,12 @@ export default function Dashboard() {
                   : startingPoints
               }
               userPaths={gameState.board}
-              placingPath={placingRailPath}
+              placingPath={
+                placingRailPath && [placingRailPath.from, placingRailPath.to]
+              }
               onMouseMove={handleBoardMouseMove}
               onMouseLeave={handleBoardMouseLeave}
-              onClick={handleAddPath}
+              onClick={handleBoardClick}
             />
           </div>
 
@@ -169,6 +255,12 @@ export default function Dashboard() {
             className={classes.sidebar}
             players={gameState.players}
             yourCities={myCities}
+            onStartGame={handleStartGame}
+            isInitiator={myPlayer.id === gameState.initiator}
+            startDisabled={
+              gameState.currentState.state !== "WaitingForPlayers" ||
+              !everybodyHasStartingPoint
+            }
           />
         </div>
       </main>

@@ -264,3 +264,44 @@ export const points: [number, number][] = [
   [26, 13],
   [28, 13],
 ];
+
+function uniquePairs(pairs: [[number, number], [number, number]][]) {
+  return pairs.reduce(
+    (acc: [[number, number], [number, number]][], pair) =>
+      !acc.find(
+        accElement =>
+          accElement[0][0] === pair[0][0] &&
+          accElement[0][1] === pair[0][1] &&
+          accElement[1][0] === pair[1][0] &&
+          accElement[1][1] === pair[1][1]
+      )
+        ? [...acc, pair]
+        : acc,
+    []
+  );
+}
+
+export const pointPairs = points
+  .reduce(
+    (arr: [[number, number], [number, number]][], p1) =>
+      uniquePairs([
+        ...arr,
+        ...points
+          .filter(
+            p2 =>
+              !(p2[0] === p1[0] && p2[1] === p1[1]) &&
+              (Math.sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2) <=
+                Math.sqrt(2) ||
+                (p2[1] - p1[1] === 0 && p2[0] - p1[0] === 2))
+          )
+          .map<[[number, number], [number, number]]>(
+            p2 =>
+              [p1, p2].sort((a, b) => a[0] - b[0]) as [
+                [number, number],
+                [number, number]
+              ]
+          ),
+      ]),
+    []
+  )
+  .map(([from, to]) => ({ from, to, double: Math.random() > 0.75 }));

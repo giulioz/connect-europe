@@ -24,11 +24,11 @@ export type Player = {
   color: PlayerColors;
   penalityPoints: number;
   targetCities: CityName[];
-  startingPoint: BoardPoint;
+  startingPoint: BoardPoint | null;
 };
 
 export type CurrentState =
   | { state: "WaitingForPlayers" }
-  | { state: "Turn"; playerID: PlayerID; railPlaced: number }
+  | { state: "Turn"; playerID: PlayerID; railsLeft: number }
   | { state: "EndRound"; winnerID: PlayerID }
   | { state: "Finish"; winnerID: PlayerID };

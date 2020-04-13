@@ -6,11 +6,12 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Avatar from "@material-ui/core/Avatar";
+import Divider from "@material-ui/core/Divider";
+import Button from "@material-ui/core/Button";
 import { orange, yellow, blue, green, red } from "@material-ui/core/colors";
 
 import { City } from "../map";
 import { Player } from "../gameTypes";
-import { Divider } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   listItem: {
@@ -27,6 +28,13 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down("md")]: {
       flexBasis: "100%",
       width: 0,
+    },
+  },
+  startButton: {
+    marginTop: theme.spacing(2),
+    flexGrow: 1,
+    [theme.breakpoints.down("md")]: {
+      flexGrow: 0,
     },
   },
   sidebarCityName: {
@@ -58,10 +66,16 @@ export default function GameSidebar({
   className,
   players,
   yourCities,
+  isInitiator,
+  startDisabled,
+  onStartGame,
 }: {
   players: Player[];
   yourCities: City[];
   className?: string;
+  isInitiator: boolean;
+  startDisabled: boolean;
+  onStartGame(): void;
 }) {
   const classes = useStyles();
 
@@ -78,6 +92,18 @@ export default function GameSidebar({
           <ListItemText>{player.name}</ListItemText>
         </ListItem>
       ))}
+
+      <ListItem className={classes.listItem}>
+        <Button
+          onClick={onStartGame}
+          className={classes.startButton}
+          variant="contained"
+          color="primary"
+          disabled={startDisabled}
+        >
+          {isInitiator ? "Start Game" : "Wait the initiator to start"}
+        </Button>
+      </ListItem>
 
       <div className={classes.listItemBreak} />
       <Divider className={classes.divider} />
