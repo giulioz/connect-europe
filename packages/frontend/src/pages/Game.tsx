@@ -87,6 +87,44 @@ const initialGameState: GameState = {
   board: [],
 };
 
+function StateDescription({
+  gameState,
+  myPlayer,
+}: {
+  gameState: GameState;
+  myPlayer: Player;
+}) {
+  switch (gameState.currentState.state) {
+    case "WaitingForPlayers":
+      return (
+        <>
+          {!myPlayer.startingPoint && <>Place your starting point. </>}
+          {gameState.initiator === myPlayer.id && (
+            <>Press START GAME when everybody is ready.</>
+          )}
+          {gameState.initiator !== myPlayer.id && myPlayer.startingPoint && (
+            <>Wait for the other players…</>
+          )}
+        </>
+      );
+
+    case "Turn":
+      if (gameState.currentState.playerID === myPlayer.id) {
+        return (
+          <>
+            It's your turn. You can place {gameState.currentState.railsLeft}{" "}
+            more rails.
+          </>
+        );
+      } else {
+        return <>Wait for your turn.</>;
+      }
+
+    default:
+      return null;
+  }
+}
+
 export default function Dashboard() {
   const classes = useStyles();
 
@@ -156,7 +194,10 @@ export default function Dashboard() {
           }
           return state;
         });
-      } else if (gameState.currentState.railsLeft >= 1) {
+      } else if (
+        !placingRailPath.double &&
+        gameState.currentState.railsLeft >= 1
+      ) {
         setGameState(state => {
           if (state.currentState.state === "Turn") {
             return {
@@ -199,7 +240,7 @@ export default function Dashboard() {
     ) {
       if (segment.double && gameState.currentState.railsLeft >= 2) {
         setPlacingRailPath(segment);
-      } else if (gameState.currentState.railsLeft >= 1) {
+      } else if (!segment.double && gameState.currentState.railsLeft >= 1) {
         setPlacingRailPath(segment);
       } else {
         setPlacingRailPath(null);
@@ -221,7 +262,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <AppBar position="absolute" color="transparent">
+      <AppBar position="absolute">
         <Toolbar>
           <Typography
             component="h1"
@@ -230,7 +271,7 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            {gameState.currentState.state}
+            <StateDescription gameState={gameState} myPlayer={myPlayer} />
           </Typography>
         </Toolbar>
       </AppBar>
