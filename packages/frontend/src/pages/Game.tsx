@@ -70,7 +70,10 @@ export default function Dashboard() {
       randomPick(cities.filter(city => city.color === color))
     )
   );
-  const userPaths: [[number, number], [number, number]][] = [
+
+  const [userPaths, setUserPaths] = useState<
+    [[number, number], [number, number]][]
+  >([
     [
       [5, 6],
       [7, 6],
@@ -87,11 +90,18 @@ export default function Dashboard() {
       [10, 7],
       [12, 7],
     ],
-  ];
+  ]);
 
   const [placingRailPath, setPlacingRailPath] = useState<
     [[number, number], [number, number]] | null
   >(null);
+
+  function handleAddPath() {
+    if (placingRailPath) {
+      setUserPaths(paths => [...paths, placingRailPath]);
+      setPlacingRailPath(null);
+    }
+  }
 
   return (
     <Layout>
@@ -117,6 +127,7 @@ export default function Dashboard() {
               userPaths={userPaths}
               placingPath={placingRailPath}
               onMoveOverRail={setPlacingRailPath}
+              onClick={handleAddPath}
             />
           </div>
 

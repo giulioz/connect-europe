@@ -255,6 +255,7 @@ export default withParentSize<
   {
     userPaths: [[number, number], [number, number]][];
     placingPath: [[number, number], [number, number]] | null;
+    onClick(): void;
     onMoveOverRail(coord: [[number, number], [number, number]]): void;
   } & WithParentSizeProps
 >(function GameBoard({
@@ -262,6 +263,7 @@ export default withParentSize<
   parentHeight,
   userPaths,
   placingPath,
+  onClick,
   onMoveOverRail,
 }) {
   const classes = useStyles();
@@ -296,6 +298,7 @@ export default withParentSize<
       height={parentHeight}
       viewBox={`0 0 ${svgWidth} ${svgHeight}`}
       preserveAspectRatio="xMidYMid meet"
+      onClick={onClick}
       onMouseMove={handleMouseMove}
     >
       <image href={`${process.env.PUBLIC_URL}/background.png`}></image>
@@ -317,8 +320,7 @@ export default withParentSize<
             toP={to}
             double={double}
             key={`${from}-${to}-${double}`}
-            // onMouseMove={() => onMoveOverRail([from, to])}
-            opacity={0.5}
+            opacity={0.4}
           />
         ))
       )}
