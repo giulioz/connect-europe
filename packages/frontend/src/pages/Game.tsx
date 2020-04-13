@@ -7,8 +7,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 
 import Layout from "../components/Layout";
 import GameBoard from "../components/GameBoard";
-import { cities, cityColorsArray } from "../map";
 import GameSidebar from "../components/GameSidebar";
+import { cities, cityColorsArray, City } from "../map";
+import { GameState } from "../gameTypes";
 
 const SIDENAV_SIZE = 256;
 
@@ -61,46 +62,70 @@ function randomPick<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+const initialGameState: GameState = {
+  currentState: { state: "WaitingForPlayers" },
+  initiator: "giulio",
+  players: [
+    {
+      name: "Giulio",
+      id: "giulio",
+      color: "red",
+      penalityPoints: 0,
+      targetCities: cityColorsArray.map(
+        color => randomPick(cities.filter(city => city.color === color)).name
+      ),
+      startingPoint: [9, 8],
+    },
+  ],
+  board: [],
+};
+
 export default function Dashboard() {
   const classes = useStyles();
 
-  const players = ["Giulio", "Giacomo"];
-  const yourCities = useAutoMemo(
-    cityColorsArray.map(color =>
-      randomPick(cities.filter(city => city.color === color))
-    )
-  );
+  const [gameState, setGameState] = useState<GameState>(initialGameState);
 
-  const [userPaths, setUserPaths] = useState<
-    [[number, number], [number, number]][]
-  >([
-    [
-      [5, 6],
-      [7, 6],
-    ],
-    [
-      [7, 6],
-      [9, 6],
-    ],
-    [
-      [9, 6],
-      [10, 7],
-    ],
-    [
-      [10, 7],
-      [12, 7],
-    ],
-  ]);
+  const myPlayer = gameState.players[0];
+  const myCities = myPlayer.targetCities.map(
+    id => cities.find(city => city.name === id) as City
+  );
+  const startingPoints = useAutoMemo(
+    gameState.players.map(player => ({
+      pos: player.startingPoint,
+      player,
+    }))
+  );
 
   const [placingRailPath, setPlacingRailPath] = useState<
     [[number, number], [number, number]] | null
   >(null);
+  const [placingStartPiece, setPlacingStartPiece] = useState<
+    [number, number] | null
+  >(null);
 
   function handleAddPath() {
     if (placingRailPath) {
-      setUserPaths(paths => [...paths, placingRailPath]);
+      setGameState(state => ({
+        ...state,
+        board: [...state.board, placingRailPath],
+      }));
       setPlacingRailPath(null);
     }
+  }
+
+  function handleBoardMouseMove({
+    point,
+    segment,
+  }: {
+    point: [number, number];
+    segment: [[number, number], [number, number]];
+  }) {
+    setPlacingRailPath(segment);
+    setPlacingStartPiece(point);
+  }
+
+  function handleBoardMouseLeave() {
+    setPlacingRailPath(null);
   }
 
   return (
@@ -114,7 +139,7 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            Trans Europa
+            {gameState.currentState.state}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -124,17 +149,26 @@ export default function Dashboard() {
         <div className={classes.container}>
           <div className={classes.gameMapContainer}>
             <GameBoard
-              userPaths={userPaths}
+              startingPoints={
+                placingStartPiece
+                  ? [
+                      ...startingPoints,
+                      { pos: placingStartPiece, player: myPlayer },
+                    ]
+                  : startingPoints
+              }
+              userPaths={gameState.board}
               placingPath={placingRailPath}
-              onMoveOverRail={setPlacingRailPath}
+              onMouseMove={handleBoardMouseMove}
+              onMouseLeave={handleBoardMouseLeave}
               onClick={handleAddPath}
             />
           </div>
 
           <GameSidebar
             className={classes.sidebar}
-            players={players}
-            yourCities={yourCities}
+            players={gameState.players}
+            yourCities={myCities}
           />
         </div>
       </main>

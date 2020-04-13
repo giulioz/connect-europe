@@ -5,6 +5,7 @@ import { WithParentSizeProps } from "@vx/responsive/lib/enhancers/withParentSize
 import { makeStyles } from "@material-ui/core/styles";
 
 import { points, cities } from "../map";
+import { Player } from "../gameTypes";
 
 const useStyles = makeStyles(theme => ({
   gameBoardSvg: {
@@ -22,6 +23,9 @@ const useStyles = makeStyles(theme => ({
   },
   userRail: {
     filter: `drop-shadow(5px 2px 2px #ffffffaa)`,
+  },
+  startPoint: {
+    filter: `drop-shadow(2px 5px 1px #000000aa)`,
   },
 }));
 
@@ -61,6 +65,10 @@ function calcDistancePointLine(
   return (
     (x - (pair[0][0] + tNorm * dx)) ** 2 + (y - (pair[0][1] + tNorm * dy)) ** 2
   );
+}
+
+function calcDistancePointPoint(x: number, y: number, point: [number, number]) {
+  return (x - point[0]) ** 2 + (y - point[1]) ** 2;
 }
 
 const cityBulletSize = 60;
@@ -253,18 +261,25 @@ function RailLine({
 
 export default withParentSize<
   {
+    startingPoints: { pos: [number, number]; player: Player }[];
     userPaths: [[number, number], [number, number]][];
     placingPath: [[number, number], [number, number]] | null;
     onClick(): void;
-    onMoveOverRail(coord: [[number, number], [number, number]]): void;
+    onMouseMove(out: {
+      point: [number, number];
+      segment: [[number, number], [number, number]];
+    }): void;
+    onMouseLeave(): void;
   } & WithParentSizeProps
 >(function GameBoard({
+  startingPoints,
   parentWidth,
   parentHeight,
   userPaths,
   placingPath,
   onClick,
-  onMoveOverRail,
+  onMouseMove,
+  onMouseLeave,
 }) {
   const classes = useStyles();
 
@@ -287,7 +302,15 @@ export default withParentSize<
         calcDistancePointLine(nx, ny, [b.from, b.to])
     )[0];
 
-    onMoveOverRail([targetSegment.from, targetSegment.to]);
+    const targetPoint = points.sort(
+      (a, b) =>
+        calcDistancePointPoint(nx, ny, a) - calcDistancePointPoint(nx, ny, b)
+    )[0];
+
+    onMouseMove({
+      segment: [targetSegment.from, targetSegment.to],
+      point: targetPoint,
+    });
   }
 
   return (
@@ -300,18 +323,9 @@ export default withParentSize<
       preserveAspectRatio="xMidYMid meet"
       onClick={onClick}
       onMouseMove={handleMouseMove}
+      onMouseLeave={onMouseLeave}
     >
       <image href={`${process.env.PUBLIC_URL}/background.png`}></image>
-
-      {/* {points.map(([x, y]) => (
-        <circle
-          key={[x, y].join(",")}
-          cx={x * 47.5 + 47.5}
-          cy={y * 84.5 + 55}
-          fill="yellow"
-          r={8}
-        />
-      ))} */}
 
       {useAutoMemo(
         pointPairs.map(({ from, to, double }) => (
@@ -381,6 +395,27 @@ export default withParentSize<
           </React.Fragment>
         ))
       )}
+
+      {startingPoints.map(({ pos: [x, y], player: { color, id } }) => (
+        <React.Fragment key={`startPoint-${x}-${y}-${id}`}>
+          <circle
+            cx={calcX(x)}
+            cy={calcY(y)}
+            fill={color}
+            opacity={1}
+            r={10}
+            className={classes.startPoint}
+          />
+          <circle
+            cx={calcX(x)}
+            cy={calcY(y)}
+            fill={color}
+            opacity={0.5}
+            r={14}
+            className={classes.startPoint}
+          />
+        </React.Fragment>
+      ))}
     </svg>
   );
 });

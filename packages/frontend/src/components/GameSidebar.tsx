@@ -9,10 +9,19 @@ import Avatar from "@material-ui/core/Avatar";
 import { orange, yellow, blue, green, red } from "@material-ui/core/colors";
 
 import { City } from "../map";
+import { Player } from "../gameTypes";
+import { Divider } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   listItem: {
     width: theme.spacing(32),
+  },
+  divider: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    [theme.breakpoints.down("md")]: {
+      display: "none",
+    },
   },
   listItemBreak: {
     [theme.breakpoints.down("md")]: {
@@ -23,23 +32,23 @@ const useStyles = makeStyles(theme => ({
   sidebarCityName: {
     textTransform: "capitalize",
   },
-  blueCityAvatar: {
+  blueAvatar: {
     color: theme.palette.getContrastText(blue[500]),
     backgroundColor: blue[500],
   },
-  redCityAvatar: {
+  redAvatar: {
     color: theme.palette.getContrastText(red[500]),
     backgroundColor: red[500],
   },
-  greenCityAvatar: {
+  greenAvatar: {
     color: theme.palette.getContrastText(green[500]),
     backgroundColor: green[500],
   },
-  orangeCityAvatar: {
+  orangeAvatar: {
     color: theme.palette.getContrastText(orange[500]),
     backgroundColor: orange[500],
   },
-  yellowCityAvatar: {
+  yellowAvatar: {
     color: theme.palette.getContrastText(yellow[500]),
     backgroundColor: yellow[500],
   },
@@ -50,7 +59,7 @@ export default function GameSidebar({
   players,
   yourCities,
 }: {
-  players: string[];
+  players: Player[];
   yourCities: City[];
   className?: string;
 }) {
@@ -60,21 +69,24 @@ export default function GameSidebar({
     <List component="div" className={className}>
       <ListSubheader>Players</ListSubheader>
       {players.map(player => (
-        <ListItem className={classes.listItem}>
+        <ListItem key={player.id} className={classes.listItem}>
           <ListItemAvatar>
-            <Avatar>{player.substr(0, 1).toUpperCase()}</Avatar>
+            <Avatar className={(classes as any)[`${player.color}Avatar`]}>
+              {player.name.substr(0, 1).toUpperCase()}
+            </Avatar>
           </ListItemAvatar>
-          <ListItemText>{player}</ListItemText>
+          <ListItemText>{player.name}</ListItemText>
         </ListItem>
       ))}
 
       <div className={classes.listItemBreak} />
+      <Divider className={classes.divider} />
 
       <ListSubheader>Your Cities</ListSubheader>
       {yourCities.map(city => (
-        <ListItem className={classes.listItem}>
+        <ListItem className={classes.listItem} key={city.name}>
           <ListItemAvatar>
-            <Avatar className={(classes as any)[`${city.color}CityAvatar`]}>
+            <Avatar className={(classes as any)[`${city.color}Avatar`]}>
               {city.name.substr(0, 1).toUpperCase()}
             </Avatar>
           </ListItemAvatar>

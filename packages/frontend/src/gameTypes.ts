@@ -1,6 +1,15 @@
-type PlayerID = string;
-type CityName = string;
-type BoardPoint = [number, number];
+export type PlayerID = string;
+export type PlayerColors = "blue" | "red" | "green" | "orange" | "yellow";
+export const playerColorsArray: PlayerColors[] = [
+  "blue",
+  "red",
+  "green",
+  "orange",
+  "yellow",
+];
+
+export type CityName = string;
+export type BoardPoint = [number, number];
 
 export type GameState = {
   currentState: CurrentState;
@@ -12,6 +21,7 @@ export type GameState = {
 export type Player = {
   name: string;
   id: PlayerID;
+  color: PlayerColors;
   penalityPoints: number;
   targetCities: CityName[];
   startingPoint: BoardPoint;
