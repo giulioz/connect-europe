@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAutoMemo } from "hooks.macro";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -46,14 +46,14 @@ const useStyles = makeStyles(theme => ({
   sidebar: {
     gridArea: "sidebar",
     minWidth: SIDENAV_SIZE,
-    border: `1px solid ${theme.palette.divider}`,
-    padding: theme.spacing(2),
     [theme.breakpoints.down("md")]: {
       maxHeight: SIDENAV_SIZE,
     },
+    border: `1px solid ${theme.palette.divider}`,
     display: "flex",
     flexDirection: "column",
     flexWrap: "wrap",
+    overflow: "hidden",
   },
 }));
 
@@ -70,6 +70,28 @@ export default function Dashboard() {
       randomPick(cities.filter(city => city.color === color))
     )
   );
+  const userPaths: [[number, number], [number, number]][] = [
+    [
+      [5, 6],
+      [7, 6],
+    ],
+    [
+      [7, 6],
+      [9, 6],
+    ],
+    [
+      [9, 6],
+      [10, 7],
+    ],
+    [
+      [10, 7],
+      [12, 7],
+    ],
+  ];
+
+  const [placingRailPath, setPlacingRailPath] = useState<
+    [[number, number], [number, number]] | null
+  >(null);
 
   return (
     <Layout>
@@ -91,7 +113,11 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <div className={classes.container}>
           <div className={classes.gameMapContainer}>
-            <GameBoard />
+            <GameBoard
+              userPaths={userPaths}
+              placingPath={placingRailPath}
+              onMoveOverRail={setPlacingRailPath}
+            />
           </div>
 
           <GameSidebar

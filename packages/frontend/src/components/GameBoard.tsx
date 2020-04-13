@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useAutoMemo } from "hooks.macro";
 import { withParentSize } from "@vx/responsive";
+import { WithParentSizeProps } from "@vx/responsive/lib/enhancers/withParentSize";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { points, cities } from "../map";
@@ -19,16 +20,47 @@ const useStyles = makeStyles(theme => ({
     textAnchor: "middle",
     font: `20px sans-serif`,
   },
+  userRail: {
+    filter: `drop-shadow(5px 2px 2px #ffffffaa)`,
+  },
 }));
 
+const svgWidth = 1920;
+const svgHeight = 1227;
+
+const cellWidth = 47.5;
+const cellHeight = 84.5;
+
 function calcX(px: number) {
-  return px * 47.5 + 47.5;
+  return px * cellWidth + 47.5;
 }
 function calcY(py: number) {
-  return py * 84.5 + 55;
+  return py * cellHeight + 55;
 }
 function calcPos(px: number, py: number, offsetX = 0, offsetY = 0) {
   return { x: calcX(px) + offsetX, y: calcY(py) + offsetY };
+}
+function calcPosInverse(px: number, py: number) {
+  const x = (px - 47.5) / cellWidth;
+  const y = (py - 55) / cellHeight;
+  return [x, y];
+}
+
+function calcDistancePointLine(
+  x: number,
+  y: number,
+  pair: [[number, number], [number, number]]
+) {
+  const dx = pair[1][0] - pair[0][0];
+  const dy = pair[1][1] - pair[0][1];
+  const l2 = dx * dx + dy * dy;
+
+  const t = ((x - pair[0][0]) * dx + (y - pair[0][1]) * dy) / l2;
+  const tNorm = Math.max(0, Math.min(1, t));
+
+  return (
+    (x - (pair[0][0] + tNorm * dx)) ** 2 + (y - (pair[0][1] + tNorm * dy)) ** 2
+  );
 }
 
 const cityBulletSize = 60;
@@ -168,6 +200,8 @@ function RailLine({
         stroke="black"
         strokeWidth={5}
         startPiece
+        {...rest}
+        offset={0}
       />
       <OffsettedLine
         stroke="black"
@@ -199,6 +233,8 @@ function RailLine({
         stroke="black"
         strokeWidth={5}
         endPiece
+        {...rest}
+        offset={0}
       />
     </>
   ) : (
@@ -215,19 +251,52 @@ function RailLine({
   );
 }
 
-export default withParentSize(function GameBoard({
+export default withParentSize<
+  {
+    userPaths: [[number, number], [number, number]][];
+    placingPath: [[number, number], [number, number]] | null;
+    onMoveOverRail(coord: [[number, number], [number, number]]): void;
+  } & WithParentSizeProps
+>(function GameBoard({
   parentWidth,
   parentHeight,
+  userPaths,
+  placingPath,
+  onMoveOverRail,
 }) {
   const classes = useStyles();
 
+  const svgRef = useRef<SVGSVGElement | null>(null);
+
+  function handleMouseMove(event: React.MouseEvent<SVGSVGElement>) {
+    if (!svgRef.current) return;
+
+    const point = svgRef.current.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const tPoint = point.matrixTransform(
+      (svgRef.current.getScreenCTM() as any).inverse()
+    );
+    const [nx, ny] = calcPosInverse(tPoint.x, tPoint.y);
+
+    const targetSegment = pointPairs.sort(
+      (a, b) =>
+        calcDistancePointLine(nx, ny, [a.from, a.to]) -
+        calcDistancePointLine(nx, ny, [b.from, b.to])
+    )[0];
+
+    onMoveOverRail([targetSegment.from, targetSegment.to]);
+  }
+
   return (
     <svg
+      ref={svgRef}
       className={classes.gameBoardSvg}
       width={parentWidth}
       height={parentHeight}
-      viewBox="0 0 1920 1227"
+      viewBox={`0 0 ${svgWidth} ${svgHeight}`}
       preserveAspectRatio="xMidYMid meet"
+      onMouseMove={handleMouseMove}
     >
       <image href={`${process.env.PUBLIC_URL}/background.png`}></image>
 
@@ -248,14 +317,42 @@ export default withParentSize(function GameBoard({
             toP={to}
             double={double}
             key={`${from}-${to}-${double}`}
-            onMouseMove={console.log}
+            // onMouseMove={() => onMoveOverRail([from, to])}
+            opacity={0.5}
           />
         ))
       )}
 
+      {userPaths.map(([from, to]) => (
+        <OffsettedLine
+          key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
+          stroke="red"
+          strokeWidth={8}
+          lengthOffset={6}
+          x1={calcX(from[0])}
+          y1={calcY(from[1])}
+          x2={calcX(to[0])}
+          y2={calcY(to[1])}
+          className={classes.userRail}
+        />
+      ))}
+
+      {placingPath && (
+        <OffsettedLine
+          stroke="yellow"
+          strokeWidth={8}
+          lengthOffset={6}
+          x1={calcX(placingPath[0][0])}
+          y1={calcY(placingPath[0][1])}
+          x2={calcX(placingPath[1][0])}
+          y2={calcY(placingPath[1][1])}
+          className={classes.userRail}
+        />
+      )}
+
       {useAutoMemo(
         cities.map(({ name, color, position: [x, y], textWidth }) => (
-          <>
+          <React.Fragment key={`city-${name}`}>
             <image
               {...calcPos(x, y)}
               width={cityBulletSize}
@@ -279,7 +376,7 @@ export default withParentSize(function GameBoard({
             >
               {name.toUpperCase()}
             </text>
-          </>
+          </React.Fragment>
         ))
       )}
     </svg>
