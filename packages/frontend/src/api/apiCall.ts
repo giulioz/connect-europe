@@ -1,9 +1,10 @@
-import { Endpoints, utils } from "@trans-europa/common";
 import {
+  Endpoints,
+  withParameters,
   ParamsType,
   ResType,
   ReqType,
-} from "@trans-europa/common/src/utils";
+} from "@trans-europa/common";
 import config from "../config";
 
 export default async function apiCall<K extends keyof Endpoints>(
@@ -11,7 +12,7 @@ export default async function apiCall<K extends keyof Endpoints>(
   options: { params: ParamsType<K>; body: ReqType<K> }
 ): Promise<ResType<K>> {
   const method = endpoint.split(" ")[0];
-  const url = utils.withParameters(endpoint, options.params);
+  const url = withParameters(endpoint, options.params);
 
   const res = await fetch(config.apiURL + url, {
     method,

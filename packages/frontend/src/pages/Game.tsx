@@ -5,11 +5,18 @@ import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 
+import {
+  GameState,
+  Player,
+  BoardPoint,
+  cities,
+  cityColorsArray,
+  City,
+  pointPairs,
+} from "@trans-europa/common";
 import Layout from "../components/Layout";
 import GameBoard from "../components/GameBoard";
 import GameSidebar from "../components/GameSidebar";
-import { cities, cityColorsArray, City, pointPairs } from "../map";
-import { GameState, Player, BoardPoint } from "../gameTypes";
 
 const SIDENAV_SIZE = 256;
 

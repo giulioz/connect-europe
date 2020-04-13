@@ -4,8 +4,7 @@ import { withParentSize } from "@vx/responsive";
 import { WithParentSizeProps } from "@vx/responsive/lib/enhancers/withParentSize";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { points, cities, pointPairs } from "../map";
-import { Player } from "../gameTypes";
+import { Player, points, cities, pointPairs } from "@trans-europa/common";
 
 const useStyles = makeStyles(theme => ({
   gameBoardSvg: {

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Endpoints } from "@trans-europa/common";
-import { ResType, ParamsType } from "@trans-europa/common/src/utils";
+import { Endpoints, ResType, ParamsType } from "@trans-europa/common";
 import apiCall from "./apiCall";
 
 export function useRemoteData<K extends keyof Endpoints>(
