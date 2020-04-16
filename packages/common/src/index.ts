@@ -27,11 +27,11 @@ import {
 } from "./map";
 import {
   createInitialGameState,
-  createGameStateReducer,
   gameStateReducer,
 } from "./gameStateManagement";
 import {
   GameStateAction,
+  setState,
   addPlayer,
   removePlayer,
   setPlayerInitialPoint,
@@ -41,7 +41,6 @@ import {
 
 export {
   createInitialGameState,
-  createGameStateReducer,
   gameStateReducer,
   Endpoints,
   withParameters,
@@ -70,4 +69,5 @@ export {
   setPlayerInitialPoint,
   startGame,
   placeRail,
+  setState,
 };

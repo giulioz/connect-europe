@@ -14,10 +14,12 @@ import {
   City,
   pointPairs,
   randomPick,
+  GameStateAction,
 } from "@trans-europa/common";
 import Layout from "../components/Layout";
 import GameBoard from "../components/GameBoard";
 import GameSidebar from "../components/GameSidebar";
+import { useRemoteState } from "../api/hooks";
 
 const SIDENAV_SIZE = 256;
 
@@ -124,10 +126,14 @@ function StateDescription({
   }
 }
 
-export default function Dashboard() {
+function GameWrapper({
+  gameState,
+  dispatch,
+}: {
+  gameState: GameState;
+  dispatch: (action: GameStateAction) => void;
+}) {
   const classes = useStyles();
-
-  const [gameState, setGameState] = useState<GameState>(initialGameState);
 
   const myPlayer = gameState.players[0];
   const myCities = myPlayer.targetCities.map(
@@ -139,11 +145,11 @@ export default function Dashboard() {
         pos: player.startingPoint,
         player,
       }))
-      .filter(p => p.pos !== null)
-  ) as {
-    pos: BoardPoint;
-    player: Player;
-  }[];
+      .filter(p => p.pos !== null) as {
+      pos: BoardPoint;
+      player: Player;
+    }[]
+  );
   const everybodyHasStartingPoint =
     startingPoints.length === gameState.players.length;
 
@@ -160,14 +166,14 @@ export default function Dashboard() {
       !myPlayer.startingPoint &&
       placingStartPiece
     ) {
-      setGameState(state => ({
-        ...state,
-        players: state.players.map(player =>
-          player.id === myPlayer.id
-            ? { ...player, startingPoint: placingStartPiece }
-            : player
-        ),
-      }));
+      // setGameState(state => ({
+      //   ...state,
+      //   players: state.players.map(player =>
+      //     player.id === myPlayer.id
+      //       ? { ...player, startingPoint: placingStartPiece }
+      //       : player
+      //   ),
+      // }));
       setPlacingStartPiece(null);
     }
 
@@ -177,42 +183,42 @@ export default function Dashboard() {
       placingRailPath
     ) {
       if (placingRailPath.double && gameState.currentState.railsLeft >= 2) {
-        setGameState(state => {
-          if (state.currentState.state === "Turn") {
-            return {
-              ...state,
-              board: [
-                ...state.board,
-                [placingRailPath.from, placingRailPath.to],
-              ],
-              currentState: {
-                ...state.currentState,
-                railsLeft: state.currentState.railsLeft - 2,
-              },
-            };
-          }
-          return state;
-        });
+        // setGameState(state => {
+        //   if (state.currentState.state === "Turn") {
+        //     return {
+        //       ...state,
+        //       board: [
+        //         ...state.board,
+        //         [placingRailPath.from, placingRailPath.to],
+        //       ],
+        //       currentState: {
+        //         ...state.currentState,
+        //         railsLeft: state.currentState.railsLeft - 2,
+        //       },
+        //     };
+        //   }
+        //   return state;
+        // });
       } else if (
         !placingRailPath.double &&
         gameState.currentState.railsLeft >= 1
       ) {
-        setGameState(state => {
-          if (state.currentState.state === "Turn") {
-            return {
-              ...state,
-              board: [
-                ...state.board,
-                [placingRailPath.from, placingRailPath.to],
-              ],
-              currentState: {
-                ...state.currentState,
-                railsLeft: state.currentState.railsLeft - 1,
-              },
-            };
-          }
-          return state;
-        });
+        // setGameState(state => {
+        //   if (state.currentState.state === "Turn") {
+        //     return {
+        //       ...state,
+        //       board: [
+        //         ...state.board,
+        //         [placingRailPath.from, placingRailPath.to],
+        //       ],
+        //       currentState: {
+        //         ...state.currentState,
+        //         railsLeft: state.currentState.railsLeft - 1,
+        //       },
+        //     };
+        //   }
+        //   return state;
+        // });
       }
 
       setPlacingRailPath(null);
@@ -253,10 +259,10 @@ export default function Dashboard() {
   }
 
   function handleStartGame() {
-    setGameState(state => ({
-      ...state,
-      currentState: { state: "Turn", railsLeft: 2, playerID: myPlayer.id },
-    }));
+    // setGameState(state => ({
+    //   ...state,
+    //   currentState: { state: "Turn", railsLeft: 2, playerID: myPlayer.id },
+    // }));
   }
 
   return (
@@ -313,4 +319,13 @@ export default function Dashboard() {
       </main>
     </Layout>
   );
+}
+
+export default function Game() {
+  const [gameState, dispatch] = useRemoteState();
+  if (gameState === null || dispatch === null) {
+    return null;
+  }
+
+  return <GameWrapper gameState={gameState} dispatch={dispatch} />;
 }

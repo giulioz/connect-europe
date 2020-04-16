@@ -7,7 +7,8 @@ import { createStore } from "redux";
 
 import {
   createInitialGameState,
-  createGameStateReducer,
+  setState,
+  gameStateReducer,
 } from "@trans-europa/common";
 import ep from "./safeEndpoints";
 
@@ -26,11 +27,16 @@ const server = http.createServer(app);
 const wsServer = new WebSocket.Server({ server });
 
 const initialGameState = createInitialGameState("giulio");
-const gameStateReducer = createGameStateReducer(initialGameState);
 const gameStateStore = createStore(gameStateReducer);
+gameStateStore.dispatch(setState(initialGameState));
 
 ep(app, "GET /initialState", (req, res) => {
-  res.send({ status: "ok", data: gameStateStore.getState() });
+  const state = gameStateStore.getState();
+  if (state !== null) {
+    res.send({ status: "ok", data: state });
+  } else {
+    res.send({ status: "error", error: "No state initialized." });
+  }
 });
 
 wsServer.on("connection", ws => {});

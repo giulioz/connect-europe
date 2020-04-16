@@ -6,6 +6,8 @@ import {
   ParamsType,
   GameState,
   gameStateReducer,
+  GameStateAction,
+  setState,
 } from "@trans-europa/common";
 import apiCall from "./apiCall";
 import config from "../config";
@@ -31,12 +33,13 @@ export function useRemoteData<K extends keyof Endpoints>(
   return data;
 }
 
-export function useRemoteState() {
-  const [initialState, setInitialState] = useState<GameState | null>(null);
-  const [state, dispatch] = useReducer(gameStateReducer, initialState as any);
+export function useRemoteState(): [
+  GameState | null,
+  ((action: GameStateAction) => void) | null
+] {
+  const [state, dispatch] = useReducer(gameStateReducer, null);
   const [ready, setReady] = useState<boolean>(false);
   const webSocketRef = useRef<WebSocket | null>(null);
-  const dispatchRef = useRef<() => void | null>(null);
 
   useEffect(() => {
     async function init() {
@@ -45,21 +48,29 @@ export function useRemoteState() {
         body: null,
       });
       if (received.status === "ok") {
-        setInitialState(received.data);
+        dispatch(setState(received.data));
       }
 
       webSocketRef.current = new WebSocket(config.wsURL);
-      webSocketRef.current.onopen = () => {
-        setReady(true);
-      };
       webSocketRef.current.onmessage = message => {
         console.log(message);
-        dispatch(message as any);
+        dispatch(JSON.parse(message.data));
+      };
+      webSocketRef.current.onopen = () => {
+        setReady(true);
       };
     }
 
     init();
   }, []);
 
-  return [state, dispatchRef.current];
+  function handleDispatch(action: GameStateAction) {
+    if (!ready || !webSocketRef.current) {
+      return;
+    }
+
+    webSocketRef.current.send(JSON.stringify(action));
+  }
+
+  return [state, handleDispatch];
 }

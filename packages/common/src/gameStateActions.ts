@@ -1,5 +1,10 @@
 import { Player, GameState } from "./gameTypes";
 
+export const setState = (state: GameState) => ({
+  type: "SET_STATE" as const,
+  state,
+});
+
 export const addPlayer = (name: Player["name"]) => ({
   type: "ADD_PLAYER" as const,
   name,
@@ -29,6 +34,7 @@ export const placeRail = (rail: GameState["board"][0]) => ({
 });
 
 export type GameStateAction =
+  | ReturnType<typeof setState>
   | ReturnType<typeof addPlayer>
   | ReturnType<typeof removePlayer>
   | ReturnType<typeof setPlayerInitialPoint>

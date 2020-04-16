@@ -90,9 +90,17 @@ export function calcNeededPieces(rail: [BoardPoint, BoardPoint]) {
 }
 
 export function canPerformAction(
-  state: GameState,
+  state: GameState | null,
   action: GameStateAction
-): boolean {
+): state is GameState {
+  if (action.type === "SET_STATE") {
+    return true;
+  }
+
+  if (state === null) {
+    return false;
+  }
+
   switch (action.type) {
     case "ADD_PLAYER":
       return (
@@ -121,14 +129,19 @@ export function canPerformAction(
 }
 
 export function gameStateReducer(
-  state: GameState,
+  state: GameState | null = null,
   action: GameStateAction
-): GameState {
+): GameState | null {
+  console.log("REDUCER", state, action);
+
   if (!canPerformAction(state, action)) {
     return state;
   }
 
   switch (action.type) {
+    case "SET_STATE":
+      return action.state;
+
     case "ADD_PLAYER": {
       const player = createPlayer(state, action.name);
       return player
@@ -197,8 +210,3 @@ export function gameStateReducer(
     }
   }
 }
-
-export const createGameStateReducer = (initialState: GameState) => (
-  state: GameState = initialState,
-  action: GameStateAction
-) => gameStateReducer(state, action);
