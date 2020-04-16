@@ -13,6 +13,7 @@ import {
   cityColorsArray,
   City,
   pointPairs,
+  randomPick,
 } from "@trans-europa/common";
 import Layout from "../components/Layout";
 import GameBoard from "../components/GameBoard";
@@ -65,13 +66,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function randomPick<T>(arr: T[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 const initialGameState: GameState = {
+  gameID: "",
   currentState: { state: "WaitingForPlayers" },
-  initiator: "giulio",
+  initiatorID: "giulio",
+  lastWinnerID: null,
   players: [
     {
       name: "Giulio",
@@ -99,10 +98,10 @@ function StateDescription({
       return (
         <>
           {!myPlayer.startingPoint && <>Place your starting point. </>}
-          {gameState.initiator === myPlayer.id && (
+          {gameState.initiatorID === myPlayer.id && (
             <>Press START GAME when everybody is ready.</>
           )}
-          {gameState.initiator !== myPlayer.id && myPlayer.startingPoint && (
+          {gameState.initiatorID !== myPlayer.id && myPlayer.startingPoint && (
             <>Wait for the other players…</>
           )}
         </>
@@ -304,7 +303,7 @@ export default function Dashboard() {
             players={gameState.players}
             yourCities={myCities}
             onStartGame={handleStartGame}
-            isInitiator={myPlayer.id === gameState.initiator}
+            isInitiator={myPlayer.id === gameState.initiatorID}
             startDisabled={
               gameState.currentState.state !== "WaitingForPlayers" ||
               !everybodyHasStartingPoint

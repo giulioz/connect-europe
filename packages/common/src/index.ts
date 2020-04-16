@@ -1,5 +1,12 @@
 import Endpoints from "./Endpoints";
-import { withParameters, sleep, ParamsType, ResType, ReqType } from "./utils";
+import {
+  withParameters,
+  sleep,
+  ParamsType,
+  ResType,
+  ReqType,
+  randomPick,
+} from "./utils";
 import {
   PlayerID,
   PlayerColors,
@@ -18,11 +25,28 @@ import {
   points,
   pointPairs,
 } from "./map";
+import {
+  createInitialGameState,
+  createGameStateReducer,
+  gameStateReducer,
+} from "./gameStateManagement";
+import {
+  GameStateAction,
+  addPlayer,
+  removePlayer,
+  setPlayerInitialPoint,
+  startGame,
+  placeRail,
+} from "./gameStateActions";
 
 export {
+  createInitialGameState,
+  createGameStateReducer,
+  gameStateReducer,
   Endpoints,
   withParameters,
   sleep,
+  randomPick,
   ParamsType,
   ResType,
   ReqType,
@@ -40,4 +64,10 @@ export {
   cities,
   points,
   pointPairs,
+  GameStateAction,
+  addPlayer,
+  removePlayer,
+  setPlayerInitialPoint,
+  startGame,
+  placeRail,
 };

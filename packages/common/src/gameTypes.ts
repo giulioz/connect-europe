@@ -1,19 +1,29 @@
 export type PlayerID = string;
-export type PlayerColors = "blue" | "red" | "green" | "orange" | "yellow";
+export type PlayerColors =
+  | "blue"
+  | "red"
+  | "green"
+  | "orange"
+  | "yellow"
+  | "purple";
 export const playerColorsArray: PlayerColors[] = [
   "blue",
   "red",
   "green",
   "orange",
   "yellow",
+  "purple",
 ];
+export const maxPlayers = playerColorsArray.length;
 
 export type CityName = string;
 export type BoardPoint = [number, number];
 
 export type GameState = {
+  gameID: string;
   currentState: CurrentState;
-  initiator: PlayerID;
+  initiatorID: PlayerID;
+  lastWinnerID: PlayerID | null;
   players: Player[];
   board: [BoardPoint, BoardPoint][];
 };
@@ -32,3 +42,5 @@ export type CurrentState =
   | { state: "Turn"; playerID: PlayerID; railsLeft: number }
   | { state: "EndRound"; winnerID: PlayerID }
   | { state: "Finish"; winnerID: PlayerID };
+
+export const defaultRailsLeft = 2;
