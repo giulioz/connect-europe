@@ -1,4 +1,9 @@
-import { BoardPoint } from "./gameTypes";
+/*
+  The map four out game!
+  There lies several constants, used to check game moves in backend and draw the map in frontend
+*/
+
+import { BoardPoint } from "./gameStateTypes";
 
 export type CityColors = "blue" | "red" | "green" | "orange" | "yellow";
 export const cityColorsArray: CityColors[] = [

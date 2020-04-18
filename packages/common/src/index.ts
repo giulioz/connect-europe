@@ -1,4 +1,4 @@
-import { Endpoints, WSPayload } from "./Endpoints";
+import { Endpoints, WSPayload } from "./interopTypes";
 import {
   ParamsType,
   randomPick,
@@ -14,9 +14,10 @@ import {
   GameState,
   Player,
   PlayerColors,
-  playerColorsArray,
   PlayerID,
-} from "./gameTypes";
+} from "./gameStateTypes";
+import { isSegmentReachable, canPerformAction } from "./gameRules";
+import { playerColorsArray } from "./config";
 import {
   cities,
   City,
@@ -25,12 +26,7 @@ import {
   pointPairs,
   points,
 } from "./map";
-import {
-  canPerformAction,
-  createInitialGameState,
-  gameStateReducer,
-  canPlaceRail,
-} from "./gameStateManagement";
+import { initialGameState, gameStateReducer } from "./gameStateManagement";
 import {
   addPlayer,
   GameStateAction,
@@ -43,15 +39,15 @@ import {
 
 export {
   addPlayer,
-  canPlaceRail,
-  BoardPoint,
+  isSegmentReachable,
   canPerformAction,
+  BoardPoint,
   cities,
   City,
   CityColors,
   cityColorsArray,
   CityName,
-  createInitialGameState,
+  initialGameState,
   CurrentState,
   Endpoints,
   GameState,

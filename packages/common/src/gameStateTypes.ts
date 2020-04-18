@@ -1,3 +1,7 @@
+/*
+  Here lies our game state model
+*/
+
 export type PlayerID = string;
 export type PlayerColors =
   | "blue"
@@ -6,21 +10,11 @@ export type PlayerColors =
   | "orange"
   | "yellow"
   | "purple";
-export const playerColorsArray: PlayerColors[] = [
-  "blue",
-  "red",
-  "green",
-  "orange",
-  "yellow",
-  "purple",
-];
-export const maxPlayers = playerColorsArray.length;
 
 export type CityName = string;
 export type BoardPoint = [number, number];
 
 export type GameState = {
-  gameID: string;
   currentState: CurrentState;
   initiatorID: PlayerID | null;
   lastWinnerID: PlayerID | null;
@@ -32,15 +26,29 @@ export type Player = {
   name: string;
   id: PlayerID;
   color: PlayerColors;
+  // Calculated as number of steps to reach the remaining target cities
   penalityPoints: number;
   targetCities: CityName[];
   startingPoint: BoardPoint | null;
 };
 
-export type CurrentState =
-  | { state: "WaitingForPlayers" }
-  | { state: "Turn"; playerID: PlayerID; railsLeft: number }
-  | { state: "EndRound"; winnerID: PlayerID }
-  | { state: "Finish"; winnerID: PlayerID };
+export type TurnState = {
+  state: "Turn";
+  playerID: PlayerID;
+  railsLeft: number;
+};
 
-export const defaultRailsLeft = 2;
+export type CurrentState =
+  // Game started: still waiting for the players to join
+  // In the meantime, everybody sets his own starting point
+  | { state: "WaitingForPlayers" }
+
+  // It's somebody's turn to play!
+  | TurnState
+
+  // End of a game round, we calculate the penalityPoints and who has to quit
+  // In the meantime, everyone sets his own starting point for the new round
+  | { state: "EndRound"; winnerID: PlayerID }
+
+  // Game over! Adios and glory to the winner
+  | { state: "Finish"; winnerID: PlayerID };

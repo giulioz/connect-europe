@@ -1,5 +1,5 @@
-import { Endpoints } from "./Endpoints";
-import { BoardPoint } from "./gameTypes";
+import { Endpoints } from "./interopTypes";
+import { BoardPoint } from "./gameStateTypes";
 
 export type ParamsType<K extends keyof Endpoints> = Endpoints[K]["params"];
 export type ResType<K extends keyof Endpoints> = Endpoints[K]["res"];
@@ -88,61 +88,6 @@ export function neighs(vertex: BoardPoint, edges: [BoardPoint, BoardPoint][]) {
     ...edges.filter(e => comparePoints(e[0], vertex)).map(e => e[1]),
     ...edges.filter(e => comparePoints(e[1], vertex)).map(e => e[0]),
   ];
-}
-
-export function floydWarshall(
-  vertices: BoardPoint[],
-  edges: [BoardPoint, BoardPoint][]
-) {
-  const distances: { [key: string]: { [key: string]: number } } = {};
-  const nextVertices: {
-    [key: string]: { [key: string]: BoardPoint | null };
-  } = {};
-
-  vertices.forEach(a => {
-    distances[vertexKey(a)] = {};
-    nextVertices[vertexKey(a)] = {};
-    vertices.forEach(b => {
-      distances[vertexKey(a)][vertexKey(b)] = Infinity;
-      nextVertices[vertexKey(a)][vertexKey(b)] = null;
-    });
-  });
-
-  vertices.forEach(start => {
-    vertices.forEach(end => {
-      if (start === end) {
-        distances[vertexKey(start)][vertexKey(start)] = 0;
-      } else {
-        const edge = edges.find(([from, to]) =>
-          compareTwoPoints([from, to], [start, end])
-        );
-
-        if (edge) {
-          distances[vertexKey(start)][vertexKey(start)] = 1;
-          nextVertices[vertexKey(start)][vertexKey(end)] = start;
-        } else {
-          distances[vertexKey(start)][vertexKey(start)] = Infinity;
-        }
-      }
-    });
-  });
-
-  vertices.forEach(middle => {
-    vertices.forEach(start => {
-      vertices.forEach(end => {
-        const distViaMiddle =
-          distances[vertexKey(start)][vertexKey(start)] +
-          distances[vertexKey(middle)][vertexKey(middle)];
-
-        if (distances[vertexKey(start)][vertexKey(start)] > distViaMiddle) {
-          distances[vertexKey(start)][vertexKey(start)] = distViaMiddle;
-          nextVertices[vertexKey(start)][vertexKey(end)] = middle;
-        }
-      });
-    });
-  });
-
-  return { distances, nextVertices };
 }
 
 export function dijkstra(
