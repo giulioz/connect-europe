@@ -1,4 +1,5 @@
 import http from "http";
+import path from "path";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -26,6 +27,7 @@ const port = process.env.SERVER_PORT
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, "../../../../frontend/build/")));
 
 const server = http.createServer(app);
 const wsServer = new WebSocket.Server({ server });
@@ -50,6 +52,10 @@ ep(app, "GET /state/:gameID", (req, res) => {
   } else {
     res.send({ status: "error", error: "No state initialized." });
   }
+});
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../../../frontend/build/index.html"));
 });
 
 function initState(gameID: string) {

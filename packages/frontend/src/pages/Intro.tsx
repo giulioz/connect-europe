@@ -7,6 +7,7 @@ import Button from "@material-ui/core/Button";
 import TrainIcon from "@material-ui/icons/Train";
 
 import Layout from "../components/Layout";
+import config from "../config";
 
 const useStyles = makeStyles(theme => ({
   appBarSpacer: theme.mixins.toolbar,
@@ -43,7 +44,10 @@ export default function Dashboard() {
             To start a new game send this link to your friends and press the
             button below:
           </Typography>
-          <pre>https://transeuropa.com/{roomId}</pre>
+          <pre>
+            {config.baseURL}
+            {roomId}
+          </pre>
           <Button
             variant="contained"
             color="primary"
