@@ -1,4 +1,4 @@
-import Endpoints from "./Endpoints";
+import { Endpoints } from "./Endpoints";
 import { BoardPoint } from "./gameTypes";
 
 export type ParamsType<K extends keyof Endpoints> = Endpoints[K]["params"];
@@ -65,54 +65,136 @@ export function uniquePairs(pairs: [BoardPoint, BoardPoint][]) {
   );
 }
 
+export function vertexKey(vertex: BoardPoint) {
+  return `${vertex[0]},${vertex[1]}`;
+}
+
+export function popMin<T>(arr: [T, number][]) {
+  let best = Infinity;
+  let bestI = 0;
+  arr.forEach(([v, k], i) => {
+    if (k < best) {
+      bestI = i;
+    }
+  });
+
+  const [value, k] = arr[bestI];
+  arr.splice(bestI, 1);
+  return value;
+}
+
+export function neighs(vertex: BoardPoint, edges: [BoardPoint, BoardPoint][]) {
+  return [
+    ...edges.filter(e => comparePoints(e[0], vertex)).map(e => e[1]),
+    ...edges.filter(e => comparePoints(e[1], vertex)).map(e => e[0]),
+  ];
+}
+
 export function floydWarshall(
   vertices: BoardPoint[],
   edges: [BoardPoint, BoardPoint][]
 ) {
-  const nextVertices: (BoardPoint | null)[][] = Array(vertices.length)
-    .fill(null)
-    .map(() => {
-      return Array(vertices.length).fill(null);
-    });
+  const distances: { [key: string]: { [key: string]: number } } = {};
+  const nextVertices: {
+    [key: string]: { [key: string]: BoardPoint | null };
+  } = {};
 
-  const distances: number[][] = Array(vertices.length)
-    .fill(Infinity)
-    .map(() => {
-      return Array(vertices.length).fill(Infinity);
+  vertices.forEach(a => {
+    distances[vertexKey(a)] = {};
+    nextVertices[vertexKey(a)] = {};
+    vertices.forEach(b => {
+      distances[vertexKey(a)][vertexKey(b)] = Infinity;
+      nextVertices[vertexKey(a)][vertexKey(b)] = null;
     });
+  });
 
-  vertices.forEach((startVertex, startIndex) => {
-    vertices.forEach((endVertex, endIndex) => {
-      if (startVertex === endVertex) {
-        distances[startIndex][endIndex] = 0;
+  vertices.forEach(start => {
+    vertices.forEach(end => {
+      if (start === end) {
+        distances[vertexKey(start)][vertexKey(start)] = 0;
       } else {
         const edge = edges.find(([from, to]) =>
-          compareTwoPoints([from, to], [startVertex, endVertex])
+          compareTwoPoints([from, to], [start, end])
         );
 
         if (edge) {
-          distances[startIndex][endIndex] = 1;
-          nextVertices[startIndex][endIndex] = startVertex;
+          distances[vertexKey(start)][vertexKey(start)] = 1;
+          nextVertices[vertexKey(start)][vertexKey(end)] = start;
         } else {
-          distances[startIndex][endIndex] = Infinity;
+          distances[vertexKey(start)][vertexKey(start)] = Infinity;
         }
       }
     });
   });
 
-  vertices.forEach((middleVertex, middleIndex) => {
-    vertices.forEach((startVertex, startIndex) => {
-      vertices.forEach((endVertex, endIndex) => {
+  vertices.forEach(middle => {
+    vertices.forEach(start => {
+      vertices.forEach(end => {
         const distViaMiddle =
-          distances[startIndex][middleIndex] + distances[middleIndex][endIndex];
+          distances[vertexKey(start)][vertexKey(start)] +
+          distances[vertexKey(middle)][vertexKey(middle)];
 
-        if (distances[startIndex][endIndex] > distViaMiddle) {
-          distances[startIndex][endIndex] = distViaMiddle;
-          nextVertices[startIndex][endIndex] = middleVertex;
+        if (distances[vertexKey(start)][vertexKey(start)] > distViaMiddle) {
+          distances[vertexKey(start)][vertexKey(start)] = distViaMiddle;
+          nextVertices[vertexKey(start)][vertexKey(end)] = middle;
         }
       });
     });
   });
 
   return { distances, nextVertices };
+}
+
+export function dijkstra(
+  vertices: BoardPoint[],
+  edges: [BoardPoint, BoardPoint][],
+  startVertex: BoardPoint
+) {
+  const distances: { [key: string]: number } = {};
+  const visitedVertices: { [key: string]: BoardPoint } = {};
+  const previousVertices: { [key: string]: null | BoardPoint } = {};
+  const queue: [BoardPoint, number][] = [];
+
+  vertices.forEach(vertex => {
+    distances[vertexKey(vertex)] = Infinity;
+    previousVertices[vertexKey(vertex)] = null;
+  });
+
+  distances[vertexKey(startVertex)] = 0;
+
+  queue.push([startVertex, distances[vertexKey(startVertex)]]);
+
+  while (queue.length > 0) {
+    const currentVertex = popMin(queue);
+
+    neighs(currentVertex, edges).forEach(neighbor => {
+      if (!visitedVertices[vertexKey(neighbor)]) {
+        const existingDistanceToNeighbor = distances[vertexKey(neighbor)];
+        const distanceToNeighborFromCurrent =
+          distances[vertexKey(currentVertex)] + 1;
+
+        if (distanceToNeighborFromCurrent < existingDistanceToNeighbor) {
+          distances[vertexKey(neighbor)] = distanceToNeighborFromCurrent;
+
+          const foundI = queue.findIndex(([v]) => comparePoints(v, neighbor));
+          if (foundI !== -1) {
+            queue[foundI] = [neighbor, distances[vertexKey(neighbor)]];
+          }
+
+          previousVertices[vertexKey(neighbor)] = currentVertex;
+        }
+
+        if (!queue.find(([v]) => comparePoints(v, neighbor))) {
+          queue.push([neighbor, distances[vertexKey(neighbor)]]);
+        }
+      }
+    });
+
+    visitedVertices[vertexKey(currentVertex)] = currentVertex;
+  }
+
+  return {
+    distances,
+    previousVertices,
+  };
 }

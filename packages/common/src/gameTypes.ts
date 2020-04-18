@@ -22,7 +22,7 @@ export type BoardPoint = [number, number];
 export type GameState = {
   gameID: string;
   currentState: CurrentState;
-  initiatorID: PlayerID;
+  initiatorID: PlayerID | null;
   lastWinnerID: PlayerID | null;
   players: Player[];
   board: [BoardPoint, BoardPoint][];

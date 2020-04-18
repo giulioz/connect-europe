@@ -6,6 +6,7 @@ import {
   maxPlayers,
   BoardPoint,
   defaultRailsLeft,
+  Player,
 } from "./gameTypes";
 import { GameStateAction } from "./gameStateActions";
 import { cityColorsArray, cities, points, City, pointPairs } from "./map";
@@ -14,36 +15,26 @@ import {
   randomPick,
   uniquePairs,
   compareTwoPoints,
+  dijkstra,
+  vertexKey,
 } from "./utils";
 
-export function createInitialGameState(initiatorName: string): GameState {
-  const gameID = uuid();
-  const initiatorID = uuid();
-
+export function createInitialGameState(gameID: string): GameState {
   return {
     gameID,
     currentState: { state: "WaitingForPlayers" },
-    initiatorID,
+    initiatorID: null,
     lastWinnerID: null,
-    players: [
-      {
-        name: initiatorName,
-        id: initiatorID,
-        color: playerColorsArray[0],
-        penalityPoints: 0,
-        targetCities: cityColorsArray.map(
-          color => randomPick(cities.filter(city => city.color === color)).name
-        ),
-        startingPoint: null,
-      },
-    ],
+    players: [],
     board: [],
   };
 }
 
-export function createPlayer(state: GameState, name: string) {
-  const playerID = uuid();
-
+export function createPlayer(
+  state: GameState,
+  id: Player["id"],
+  name: Player["name"]
+) {
   const freeCities = cities.filter(city =>
     state.players.every(
       player => !player.targetCities.find(pc => pc === city.name)
@@ -57,7 +48,7 @@ export function createPlayer(state: GameState, name: string) {
 
   return {
     name,
-    id: playerID,
+    id,
     color: freeColor,
     penalityPoints: 0,
     targetCities: cityColorsArray.map(
@@ -68,15 +59,20 @@ export function createPlayer(state: GameState, name: string) {
 }
 
 export function findWinnerPlayers(state: GameState) {
-  const { distances } = floydWarshall(points, state.board);
+  const winners = state.players.filter(player => {
+    if (!player.startingPoint) {
+      return false;
+    }
 
-  return state.players.filter(player => {
+    const { distances } = dijkstra(points, state.board, player.startingPoint);
     const playerCities: City[] = player.targetCities.map(
       name => cities.find(city => city.name === name) as City
     );
     const citiesPositions = playerCities.map(city => city.position);
-    return false;
+    return citiesPositions.every(posA => distances[vertexKey(posA)] < Infinity);
   });
+
+  return winners;
 }
 
 export function calcNeededPieces(rail: [BoardPoint, BoardPoint]) {
@@ -87,6 +83,24 @@ export function calcNeededPieces(rail: [BoardPoint, BoardPoint]) {
     return false;
   }
   return destinationPair.double ? 2 : 1;
+}
+
+export function canPlaceRail(
+  state: GameState,
+  rail: [BoardPoint, BoardPoint],
+  playerID: Player["id"]
+) {
+  const player = state.players.find(player => player.id === playerID);
+  if (!player || !player.startingPoint) {
+    return false;
+  }
+
+  const { distances } = dijkstra(points, state.board, player.startingPoint);
+  const reachable =
+    distances[vertexKey(rail[0])] < Infinity ||
+    distances[vertexKey(rail[1])] < Infinity;
+
+  return reachable;
 }
 
 export function canPerformAction(
@@ -132,8 +146,6 @@ export function gameStateReducer(
   state: GameState | null = null,
   action: GameStateAction
 ): GameState | null {
-  console.log("REDUCER", state, action);
-
   if (!canPerformAction(state, action)) {
     return state;
   }
@@ -143,10 +155,11 @@ export function gameStateReducer(
       return action.state;
 
     case "ADD_PLAYER": {
-      const player = createPlayer(state, action.name);
+      const player = createPlayer(state, action.id, action.name);
       return player
         ? {
             ...state,
+            initiatorID: !state.initiatorID ? player.id : state.initiatorID,
             players: [...state.players, player],
           }
         : state;
@@ -169,14 +182,16 @@ export function gameStateReducer(
       };
 
     case "START_GAME":
-      return {
-        ...state,
-        currentState: {
-          state: "Turn",
-          playerID: state.initiatorID,
-          railsLeft: defaultRailsLeft,
-        },
-      };
+      return state.initiatorID
+        ? {
+            ...state,
+            currentState: {
+              state: "Turn",
+              playerID: state.initiatorID,
+              railsLeft: defaultRailsLeft,
+            },
+          }
+        : state;
 
     case "PLACE_RAIL": {
       const neededPieces = calcNeededPieces(action.rail);
@@ -187,10 +202,11 @@ export function gameStateReducer(
         const currentPlayerID = state.currentState.playerID;
         const nextPlayer =
           state.players[
-            state.players.findIndex(p => p.id === currentPlayerID) + 1
+            (state.players.findIndex(p => p.id === currentPlayerID) + 1) %
+              state.players.length
           ];
 
-        return {
+        const newState = {
           ...state,
           currentState: newTurn
             ? {
@@ -204,6 +220,21 @@ export function gameStateReducer(
               },
           board: newBoard,
         };
+
+        const winning = findWinnerPlayers(newState);
+        if (winning.length > 0) {
+          const winner = winning[0];
+          return {
+            ...newState,
+            lastWinnerID: winner.id,
+            currentState: {
+              state: "EndRound",
+              winnerID: winner.id,
+            },
+          };
+        } else {
+          return newState;
+        }
       } else {
         return state;
       }

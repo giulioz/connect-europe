@@ -1,27 +1,27 @@
-import { useEffect, useState, useRef, useReducer } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useAutoCallback } from "hooks.macro";
 
 import {
   Endpoints,
   ResType,
   ParamsType,
   GameState,
-  gameStateReducer,
   GameStateAction,
-  setState,
+  WSPayload,
 } from "@trans-europa/common";
 import apiCall from "./apiCall";
 import config from "../config";
 
 export function useRemoteData<K extends keyof Endpoints>(
   endpoint: K,
-  params?: ParamsType<K>
+  params: ParamsType<K>
 ) {
   const [data, setData] = useState<ResType<K> | null>(null);
 
   useEffect(() => {
     async function loadData() {
       const received = await apiCall(endpoint, {
-        params: params || {},
+        params,
         body: null,
       });
       setData(received);
@@ -33,44 +33,47 @@ export function useRemoteData<K extends keyof Endpoints>(
   return data;
 }
 
-export function useRemoteState(): [
-  GameState | null,
-  ((action: GameStateAction) => void) | null
-] {
-  const [state, dispatch] = useReducer(gameStateReducer, null);
+export function useRemoteState(
+  gameID: string | null
+): [GameState | null, ((action: GameStateAction) => void) | null, boolean] {
+  const [state, setState] = useState<GameState | null>(null);
   const [ready, setReady] = useState<boolean>(false);
   const webSocketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    async function init() {
-      const received = await apiCall("GET /initialState", {
-        params: {},
+    async function init(gameID: string) {
+      const received = await apiCall("GET /state/:gameID", {
+        params: { gameID },
         body: null,
       });
       if (received.status === "ok") {
-        dispatch(setState(received.data));
+        setState(received.data);
       }
 
       webSocketRef.current = new WebSocket(config.wsURL);
       webSocketRef.current.onmessage = message => {
-        console.log(message);
-        dispatch(JSON.parse(message.data));
+        setState(JSON.parse(message.data));
       };
       webSocketRef.current.onopen = () => {
         setReady(true);
       };
     }
 
-    init();
-  }, []);
+    if (gameID) {
+      init(gameID);
+    }
+  }, [gameID]);
 
-  function handleDispatch(action: GameStateAction) {
-    if (!ready || !webSocketRef.current) {
+  const handleDispatch = useAutoCallback(function handleDispatch(
+    action: GameStateAction
+  ) {
+    if (!ready || !webSocketRef.current || !gameID) {
       return;
     }
 
-    webSocketRef.current.send(JSON.stringify(action));
-  }
+    const payload: WSPayload = { action, gameID };
+    webSocketRef.current.send(JSON.stringify(payload));
+  });
 
-  return [state, handleDispatch];
+  return [state, handleDispatch, ready];
 }

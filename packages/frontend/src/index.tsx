@@ -36,7 +36,7 @@ function App() {
           <Route path="/" exact>
             <Intro />
           </Route>
-          <Route path="/:id">
+          <Route path="/:gameID">
             <Game />
           </Route>
         </Switch>

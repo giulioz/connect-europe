@@ -66,13 +66,15 @@ export default function GameSidebar({
   className,
   players,
   yourCities,
+  playerTurnID,
   isInitiator,
   startDisabled,
   onStartGame,
 }: {
+  className?: string;
   players: Player[];
   yourCities: City[];
-  className?: string;
+  playerTurnID: string | null;
   isInitiator: boolean;
   startDisabled: boolean;
   onStartGame(): void;
@@ -83,7 +85,11 @@ export default function GameSidebar({
     <List component="div" className={className}>
       <ListSubheader>Players</ListSubheader>
       {players.map(player => (
-        <ListItem key={player.id} className={classes.listItem}>
+        <ListItem
+          key={player.id}
+          className={classes.listItem}
+          selected={player.id === playerTurnID}
+        >
           <ListItemAvatar>
             <Avatar className={(classes as any)[`${player.color}Avatar`]}>
               {player.name.substr(0, 1).toUpperCase()}
@@ -101,7 +107,7 @@ export default function GameSidebar({
           color="primary"
           disabled={startDisabled}
         >
-          {isInitiator ? "Start Game" : "Wait the initiator to start"}
+          {isInitiator ? "Start Game" : "Wait for the initiator"}
         </Button>
       </ListItem>
 

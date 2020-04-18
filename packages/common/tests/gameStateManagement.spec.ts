@@ -6,20 +6,13 @@ import { playerColorsArray } from "../src/gameTypes";
 import { cityColorsArray, cities, City } from "../src/map";
 
 test("createInitialGameState creates an initial valid state", () => {
-  const initiatorName = "Giulio";
-  const state = createInitialGameState(initiatorName);
+  const state = createInitialGameState();
 
   expect(state).toMatchObject({
     currentState: { state: "WaitingForPlayers" },
-    lastWinner: null,
-    players: [
-      {
-        name: initiatorName,
-        color: playerColorsArray[0],
-        penalityPoints: 0,
-        startingPoint: null,
-      },
-    ],
+    initiatorID: null,
+    lastWinnerID: null,
+    players: [],
     board: [],
   });
 
@@ -37,8 +30,7 @@ test("createInitialGameState creates an initial valid state", () => {
 });
 
 test("createPlayer creates a valid player", () => {
-  const initiatorName = "Mario";
-  const state = createInitialGameState(initiatorName);
+  const state = createInitialGameState();
 
   const playerName = "Mario";
   const player = createPlayer(state, playerName);

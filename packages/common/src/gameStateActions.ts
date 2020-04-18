@@ -5,9 +5,10 @@ export const setState = (state: GameState) => ({
   state,
 });
 
-export const addPlayer = (name: Player["name"]) => ({
+export const addPlayer = (name: Player["name"], id: Player["id"]) => ({
   type: "ADD_PLAYER" as const,
   name,
+  id,
 });
 
 export const removePlayer = (id: Player["id"]) => ({

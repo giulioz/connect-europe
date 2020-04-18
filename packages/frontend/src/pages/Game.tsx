@@ -1,25 +1,32 @@
-import React, { useState } from "react";
-import { useAutoMemo } from "hooks.macro";
+import React, { useState, useEffect } from "react";
+import { v4 as uuid } from "uuid";
+import { useAutoMemo, useAutoCallback } from "hooks.macro";
+import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 
 import {
+  canPlaceRail,
   GameState,
   Player,
   BoardPoint,
   cities,
-  cityColorsArray,
   City,
   pointPairs,
-  randomPick,
   GameStateAction,
+  addPlayer,
+  startGame,
+  setPlayerInitialPoint,
+  placeRail,
 } from "@trans-europa/common";
 import Layout from "../components/Layout";
 import GameBoard from "../components/GameBoard";
 import GameSidebar from "../components/GameSidebar";
 import { useRemoteState } from "../api/hooks";
+import StateDescription from "../components/StateDescription";
+import NameInsertDialog from "../components/NameInsertDialog";
 
 const SIDENAV_SIZE = 256;
 
@@ -68,77 +75,17 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const initialGameState: GameState = {
-  gameID: "",
-  currentState: { state: "WaitingForPlayers" },
-  initiatorID: "giulio",
-  lastWinnerID: null,
-  players: [
-    {
-      name: "Giulio",
-      id: "giulio",
-      color: "red",
-      penalityPoints: 0,
-      targetCities: cityColorsArray.map(
-        color => randomPick(cities.filter(city => city.color === color)).name
-      ),
-      startingPoint: null,
-    },
-  ],
-  board: [],
-};
-
-function StateDescription({
-  gameState,
-  myPlayer,
-}: {
-  gameState: GameState;
-  myPlayer: Player;
-}) {
-  switch (gameState.currentState.state) {
-    case "WaitingForPlayers":
-      return (
-        <>
-          {!myPlayer.startingPoint && <>Place your starting point. </>}
-          {gameState.initiatorID === myPlayer.id && (
-            <>Press START GAME when everybody is ready.</>
-          )}
-          {gameState.initiatorID !== myPlayer.id && myPlayer.startingPoint && (
-            <>Wait for the other players…</>
-          )}
-        </>
-      );
-
-    case "Turn":
-      if (gameState.currentState.playerID === myPlayer.id) {
-        return (
-          <>
-            It's your turn. You can place {gameState.currentState.railsLeft}{" "}
-            more rails.
-          </>
-        );
-      } else {
-        return <>Wait for your turn.</>;
-      }
-
-    default:
-      return null;
-  }
-}
-
 function GameWrapper({
   gameState,
   dispatch,
+  myPlayerId,
 }: {
   gameState: GameState;
   dispatch: (action: GameStateAction) => void;
+  myPlayerId: string;
 }) {
   const classes = useStyles();
 
-  const myPlayer = gameState.players[0];
-  const myCities = myPlayer.targetCities.map(
-    id => cities.find(city => city.name === id) as City
-  );
   const startingPoints = useAutoMemo(
     gameState.players
       .map(player => ({
@@ -156,76 +103,35 @@ function GameWrapper({
   const [placingRailPath, setPlacingRailPath] = useState<
     typeof pointPairs[0] | null
   >(null);
-  const [placingStartPiece, setPlacingStartPiece] = useState<
-    [number, number] | null
-  >(null);
+  const [placingStartPiece, setPlacingStartPiece] = useState<BoardPoint | null>(
+    null
+  );
+
+  const myPlayer = gameState.players.find(p => p.id === myPlayerId);
 
   function handleBoardClick() {
-    if (
-      gameState.currentState.state === "WaitingForPlayers" &&
-      !myPlayer.startingPoint &&
-      placingStartPiece
-    ) {
-      // setGameState(state => ({
-      //   ...state,
-      //   players: state.players.map(player =>
-      //     player.id === myPlayer.id
-      //       ? { ...player, startingPoint: placingStartPiece }
-      //       : player
-      //   ),
-      // }));
-      setPlacingStartPiece(null);
-    }
-
-    if (
-      gameState.currentState.state === "Turn" &&
-      gameState.currentState.playerID === myPlayer.id &&
-      placingRailPath
-    ) {
-      if (placingRailPath.double && gameState.currentState.railsLeft >= 2) {
-        // setGameState(state => {
-        //   if (state.currentState.state === "Turn") {
-        //     return {
-        //       ...state,
-        //       board: [
-        //         ...state.board,
-        //         [placingRailPath.from, placingRailPath.to],
-        //       ],
-        //       currentState: {
-        //         ...state.currentState,
-        //         railsLeft: state.currentState.railsLeft - 2,
-        //       },
-        //     };
-        //   }
-        //   return state;
-        // });
-      } else if (
-        !placingRailPath.double &&
-        gameState.currentState.railsLeft >= 1
+    if (myPlayer) {
+      if (
+        gameState.currentState.state === "WaitingForPlayers" &&
+        !myPlayer.startingPoint &&
+        placingStartPiece
       ) {
-        // setGameState(state => {
-        //   if (state.currentState.state === "Turn") {
-        //     return {
-        //       ...state,
-        //       board: [
-        //         ...state.board,
-        //         [placingRailPath.from, placingRailPath.to],
-        //       ],
-        //       currentState: {
-        //         ...state.currentState,
-        //         railsLeft: state.currentState.railsLeft - 1,
-        //       },
-        //     };
-        //   }
-        //   return state;
-        // });
+        dispatch(setPlayerInitialPoint(myPlayerId, placingStartPiece));
+        setPlacingStartPiece(null);
       }
 
-      setPlacingRailPath(null);
+      if (
+        gameState.currentState.state === "Turn" &&
+        gameState.currentState.playerID === myPlayer.id &&
+        placingRailPath
+      ) {
+        dispatch(placeRail([placingRailPath.from, placingRailPath.to]));
+        setPlacingRailPath(null);
+      }
     }
   }
 
-  function handleBoardMouseMove({
+  const handleBoardMouseMove = useAutoCallback(function handleBoardMouseMove({
     point,
     segment,
   }: {
@@ -234,14 +140,16 @@ function GameWrapper({
   }) {
     if (
       gameState.currentState.state === "WaitingForPlayers" &&
+      myPlayer &&
       !myPlayer.startingPoint
     ) {
       setPlacingStartPiece(point);
     }
-
     if (
+      myPlayer &&
       gameState.currentState.state === "Turn" &&
-      gameState.currentState.playerID === myPlayer.id
+      gameState.currentState.playerID === myPlayer.id &&
+      canPlaceRail(gameState, [segment.from, segment.to], myPlayerId)
     ) {
       if (segment.double && gameState.currentState.railsLeft >= 2) {
         setPlacingRailPath(segment);
@@ -251,22 +159,29 @@ function GameWrapper({
         setPlacingRailPath(null);
       }
     }
+  });
+
+  const handleBoardMouseLeave = useAutoCallback(
+    function handleBoardMouseLeave() {
+      setPlacingRailPath(null);
+      setPlacingStartPiece(null);
+    }
+  );
+
+  const handleStartGame = useAutoCallback(function handleStartGame() {
+    dispatch(startGame());
+  });
+
+  if (!myPlayer) {
+    return null;
   }
 
-  function handleBoardMouseLeave() {
-    setPlacingRailPath(null);
-    setPlacingStartPiece(null);
-  }
-
-  function handleStartGame() {
-    // setGameState(state => ({
-    //   ...state,
-    //   currentState: { state: "Turn", railsLeft: 2, playerID: myPlayer.id },
-    // }));
-  }
+  const myCities = myPlayer.targetCities.map(
+    id => cities.find(city => city.name === id) as City
+  );
 
   return (
-    <Layout>
+    <>
       <AppBar position="absolute">
         <Toolbar>
           <Typography
@@ -308,24 +223,48 @@ function GameWrapper({
             className={classes.sidebar}
             players={gameState.players}
             yourCities={myCities}
+            playerTurnID={
+              (gameState.currentState.state === "Turn" &&
+                gameState.currentState.playerID) ||
+              null
+            }
             onStartGame={handleStartGame}
             isInitiator={myPlayer.id === gameState.initiatorID}
             startDisabled={
+              myPlayer.id !== gameState.initiatorID ||
               gameState.currentState.state !== "WaitingForPlayers" ||
               !everybodyHasStartingPoint
             }
           />
         </div>
       </main>
-    </Layout>
+    </>
   );
 }
 
 export default function Game() {
-  const [gameState, dispatch] = useRemoteState();
-  if (gameState === null || dispatch === null) {
-    return null;
-  }
+  const { gameID } = useParams();
+  const [gameState, dispatch, ready] = useRemoteState(gameID || null);
 
-  return <GameWrapper gameState={gameState} dispatch={dispatch} />;
+  const [myPlayerName, setMyPlayerName] = useState<string | null>(null);
+  const myPlayerId = useAutoMemo(uuid());
+
+  useEffect(() => {
+    if (ready && dispatch && myPlayerName) {
+      dispatch(addPlayer(myPlayerName, myPlayerId));
+    }
+  }, [myPlayerName, myPlayerId, ready, dispatch]);
+
+  return (
+    <Layout>
+      <NameInsertDialog open={!myPlayerName} onSetName={setMyPlayerName} />
+      {gameState !== null && dispatch !== null && gameID && ready && (
+        <GameWrapper
+          gameState={gameState}
+          dispatch={dispatch}
+          myPlayerId={myPlayerId}
+        />
+      )}
+    </Layout>
+  );
 }
