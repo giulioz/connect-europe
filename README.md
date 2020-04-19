@@ -2,8 +2,9 @@
 
 This project uses Lerna. There are two packages:
 
-- `frontend`: the web interface for the blockchain, written with React and TypeScript,
-- `backend`: the blockchain single-node backend, written with Node.JS, Express and TypeScript.
+- `common`: common code for frontend and backend, contains shared types and game logic,
+- `frontend`: the web interface for the game, written with React and TypeScript,
+- `backend`: the game server, written with Node.JS, Express and TypeScript.
 
 ## Scripts
 

@@ -1,7 +1,7 @@
 {
   "name": "@trans-europa/common",
   "version": "1.0.0",
-  "author": "Giulio Zausa <giulio.zausa@smc.it>",
+  "author": "Giulio Zausa <mail.zausa.giulio@gmail.com>",
   "homepage": "https://github.com/giulioz/trans-europa#readme",
   "license": "MIT",
   "main": "dist/index.js",
@@ -38,7 +38,6 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "redux": "^4.0.5",
     "uuid": "^7.0.2"
   }
 }

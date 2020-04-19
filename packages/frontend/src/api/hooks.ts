@@ -35,7 +35,12 @@ export function useRemoteData<K extends keyof Endpoints>(
 
 export function useRemoteState(
   gameID: string | null
-): [GameState | null, ((action: GameStateAction) => void) | null, boolean] {
+): [
+  GameState | null,
+  (action: GameStateAction) => void,
+  boolean,
+  (gameID: string) => Promise<void>
+] {
   const [state, setState] = useState<GameState | null>(null);
   const [ready, setReady] = useState<boolean>(false);
   const webSocketRef = useRef<WebSocket | null>(null);
@@ -52,7 +57,12 @@ export function useRemoteState(
 
       webSocketRef.current = new WebSocket(config.wsURL);
       webSocketRef.current.onmessage = message => {
-        setState(JSON.parse(message.data));
+        const parsedState = JSON.parse(message.data) as GameState;
+        if (parsedState) {
+          setState(parsedState);
+        } else {
+          console.error("Invalid state received!", message.data);
+        }
       };
       webSocketRef.current.onopen = () => {
         setReady(true);
@@ -75,5 +85,17 @@ export function useRemoteState(
     webSocketRef.current.send(JSON.stringify(payload));
   });
 
-  return [state, handleDispatch, ready];
+  const handleForceUpdate = useAutoCallback(async function handleForceUpdate(
+    gameID: string
+  ) {
+    const received = await apiCall("GET /state/:gameID", {
+      params: { gameID },
+      body: null,
+    });
+    if (received.status === "ok") {
+      setState(received.data);
+    }
+  });
+
+  return [state, handleDispatch, ready, handleForceUpdate];
 }

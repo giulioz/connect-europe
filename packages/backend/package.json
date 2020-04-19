@@ -1,7 +1,7 @@
 {
   "name": "@trans-europa/backend",
   "version": "1.0.0",
-  "author": "Giulio Zausa <giulio.zausa@smc.it>",
+  "author": "Giulio Zausa <mail.zausa.giulio@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
   "repository": {

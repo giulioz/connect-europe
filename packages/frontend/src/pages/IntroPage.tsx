@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import TrainIcon from "@material-ui/icons/Train";
 
+import { generateGameID } from "@trans-europa/common";
 import Layout from "../components/Layout";
 import config from "../config";
 
@@ -26,10 +27,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Dashboard() {
+export default function IntroPage() {
   const classes = useStyles();
 
-  const roomId = btoa(Math.round(Math.random() * 50000).toString());
+  const roomId = generateGameID();
 
   return (
     <Layout>

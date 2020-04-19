@@ -1,5 +1,5 @@
 import React from "react";
-import { GameState, Player } from "@trans-europa/common/dist";
+import { GameState, Player } from "@trans-europa/common";
 
 export default function StateDescription({
   gameState,
@@ -52,7 +52,21 @@ export default function StateDescription({
       );
     }
 
-    default:
-      return null;
+    case "Finish": {
+      const winnerID = gameState.lastWinnerID;
+      const winnerPlayer = gameState.players.find(
+        player => player.id === winnerID
+      );
+      return (
+        <>
+          {winnerPlayer &&
+            (gameState.currentState.winnerID === myPlayer.id ? (
+              <>You won!</>
+            ) : (
+              <>{winnerPlayer.name} won.</>
+            ))}
+        </>
+      );
+    }
   }
 }

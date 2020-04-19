@@ -122,5 +122,8 @@ export function gameStateReducer(
         return gameStateAfterPlace;
       }
     }
+
+    default:
+      return state;
   }
 }

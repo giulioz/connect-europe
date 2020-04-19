@@ -16,7 +16,12 @@ import {
   PlayerColors,
   PlayerID,
 } from "./gameStateTypes";
-import { isSegmentReachable, canPerformAction } from "./gameRules";
+import {
+  isSegmentReachable,
+  canPerformAction,
+  generateGameID,
+  createPlayer,
+} from "./gameRules";
 import { playerColorsArray } from "./config";
 import {
   cities,
@@ -39,20 +44,22 @@ import {
 
 export {
   addPlayer,
-  isSegmentReachable,
-  canPerformAction,
   BoardPoint,
+  canPerformAction,
   cities,
   City,
   CityColors,
   cityColorsArray,
   CityName,
-  initialGameState,
+  createPlayer,
   CurrentState,
   Endpoints,
   GameState,
   GameStateAction,
   gameStateReducer,
+  generateGameID,
+  initialGameState,
+  isSegmentReachable,
   ParamsType,
   placeRail,
   Player,

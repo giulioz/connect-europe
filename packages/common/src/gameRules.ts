@@ -107,6 +107,11 @@ export function createPlayer(
   };
 }
 
+// Generates a new valid game id
+export function generateGameID() {
+  return btoa(Math.round(Math.random() * 50000).toString());
+}
+
 // Which player has to start the turn?
 export function getInitialPlayerID(state: GameState) {
   return state.players[0].id;

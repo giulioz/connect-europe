@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { v4 as uuid } from "uuid";
+import React, { useState } from "react";
 import { useAutoMemo, useAutoCallback } from "hooks.macro";
-import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
@@ -15,17 +13,15 @@ import {
   City,
   pointPairs,
   GameStateAction,
-  addPlayer,
   startGame,
+  isSegmentReachable,
   setPlayerInitialPoint,
   placeRail,
 } from "@trans-europa/common";
-import Layout from "../components/Layout";
+
 import GameBoard from "../components/GameBoard";
 import GameSidebar from "../components/GameSidebar";
-import { useRemoteState } from "../api/hooks";
 import StateDescription from "../components/StateDescription";
-import NameInsertDialog from "../components/NameInsertDialog";
 
 const SIDENAV_SIZE = 256;
 
@@ -74,7 +70,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function GameWrapper({
+export default function Game({
   gameState,
   dispatch,
   myPlayerId,
@@ -148,7 +144,7 @@ function GameWrapper({
       myPlayer &&
       gameState.currentState.state === "Turn" &&
       gameState.currentState.playerID === myPlayer.id &&
-      canPlaceRail(gameState, [segment.from, segment.to], myPlayerId)
+      isSegmentReachable(gameState, [segment.from, segment.to], myPlayerId)
     ) {
       if (segment.double && gameState.currentState.railsLeft >= 2) {
         setPlacingRailPath(segment);
@@ -238,32 +234,5 @@ function GameWrapper({
         </div>
       </main>
     </>
-  );
-}
-
-export default function Game() {
-  const { gameID } = useParams();
-  const [gameState, dispatch, ready] = useRemoteState(gameID || null);
-
-  const [myPlayerName, setMyPlayerName] = useState<string | null>(null);
-  const myPlayerId = useAutoMemo(uuid());
-
-  useEffect(() => {
-    if (ready && dispatch && myPlayerName) {
-      dispatch(addPlayer(myPlayerName, myPlayerId));
-    }
-  }, [myPlayerName, myPlayerId, ready, dispatch]);
-
-  return (
-    <Layout>
-      <NameInsertDialog open={!myPlayerName} onSetName={setMyPlayerName} />
-      {gameState !== null && dispatch !== null && gameID && ready && (
-        <GameWrapper
-          gameState={gameState}
-          dispatch={dispatch}
-          myPlayerId={myPlayerId}
-        />
-      )}
-    </Layout>
   );
 }

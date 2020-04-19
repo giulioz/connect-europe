@@ -3,8 +3,8 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core";
 
-import Intro from "./pages/Intro";
-import Game from "./pages/Game";
+import IntroPage from "./pages/IntroPage";
+import GamePage from "./pages/GamePage";
 
 import "./globalStyles.css";
 
@@ -34,10 +34,10 @@ function App() {
       <Router>
         <Switch>
           <Route path="/" exact>
-            <Intro />
+            <IntroPage />
           </Route>
           <Route path="/:gameID">
-            <Game />
+            <GamePage />
           </Route>
         </Switch>
       </Router>
