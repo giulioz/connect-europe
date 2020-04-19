@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useAutoMemo } from "hooks.macro";
 import { withParentSize } from "@vx/responsive";
 import { WithParentSizeProps } from "@vx/responsive/lib/enhancers/withParentSize";
@@ -24,7 +24,11 @@ import {
   calcPos,
   cityBulletSize,
 } from "../mapRenderConfig";
-import { calcDistancePointLine, calcDistancePointPoint } from "../utils";
+import {
+  calcDistancePointLine,
+  calcDistancePointPoint,
+  useTimeout,
+} from "../utils";
 import {
   dijkstra,
   vertexKey,
@@ -107,6 +111,8 @@ export default withParentSize<GameBoardProps>(function GameBoard({
     });
   }
 
+  const showWinningMap = !useTimeout(3000);
+
   const winningCitiesPos = useAutoMemo(
     winningState
       ? winningState.targetCities
@@ -116,13 +122,13 @@ export default withParentSize<GameBoardProps>(function GameBoard({
   );
 
   const winningCitiesHighlighedPieces = useAutoMemo(() => {
-    if (!winningCitiesPos || !winningState) {
+    if (!winningCitiesPos || !winningState || !showWinningMap) {
       return null;
     }
 
     const { previousVertices } = dijkstra(
       points,
-      userPaths,
+      winningState.board,
       winningState.startingPoint
     );
 
@@ -168,7 +174,23 @@ export default withParentSize<GameBoardProps>(function GameBoard({
       )}
 
       {useAutoMemo(
-        userPaths.map(([from, to]) => {
+        userPaths.map(([from, to]) => (
+          <OffsettedLine
+            key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
+            stroke={"blue"}
+            strokeWidth={8}
+            lengthOffset={6}
+            x1={calcX(from[0])}
+            y1={calcY(from[1])}
+            x2={calcX(to[0])}
+            y2={calcY(to[1])}
+            className={classes.userRail}
+          />
+        ))
+      )}
+
+      {useAutoMemo(
+        pointPairs.map(({ from, to }) => {
           const isWinningPiece =
             winningCitiesHighlighedPieces &&
             winningCitiesHighlighedPieces.find(
@@ -178,17 +200,20 @@ export default withParentSize<GameBoardProps>(function GameBoard({
             );
 
           return (
-            <OffsettedLine
-              key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
-              stroke={isWinningPiece ? "red" : "blue"}
-              strokeWidth={isWinningPiece ? 16 : 8}
-              lengthOffset={isWinningPiece ? 0 : 6}
-              x1={calcX(from[0])}
-              y1={calcY(from[1])}
-              x2={calcX(to[0])}
-              y2={calcY(to[1])}
-              className={classes.userRail}
-            />
+            (isWinningPiece && (
+              <OffsettedLine
+                key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
+                stroke={isWinningPiece ? "red" : "blue"}
+                strokeWidth={isWinningPiece ? 16 : 8}
+                lengthOffset={isWinningPiece ? 0 : 6}
+                x1={calcX(from[0])}
+                y1={calcY(from[1])}
+                x2={calcX(to[0])}
+                y2={calcY(to[1])}
+                className={classes.userRail}
+              />
+            )) ||
+            null
           );
         })
       )}

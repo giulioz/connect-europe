@@ -22,6 +22,7 @@ import {
   canPerformAction,
   generateGameID,
   createPlayer,
+  generatePlayerID,
 } from "./gameRules";
 import { playerColorsArray, maxPenalityPoints } from "./config";
 import {
@@ -59,6 +60,7 @@ export {
   GameStateAction,
   gameStateReducer,
   generateGameID,
+  generatePlayerID,
   initialGameState,
   isSegmentReachable,
   maxPenalityPoints,
