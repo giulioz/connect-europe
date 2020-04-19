@@ -73,11 +73,11 @@ const useStyles = makeStyles(theme => ({
 export default function Game({
   gameState,
   dispatch,
-  myPlayerId,
+  myPlayer,
 }: {
   gameState: GameState;
   dispatch: (action: GameStateAction) => void;
-  myPlayerId: string;
+  myPlayer: Player;
 }) {
   const classes = useStyles();
 
@@ -102,16 +102,15 @@ export default function Game({
     null
   );
 
-  const myPlayer = gameState.players.find(p => p.id === myPlayerId);
-
   function handleBoardClick() {
     if (myPlayer) {
       if (
-        gameState.currentState.state === "WaitingForPlayers" &&
+        (gameState.currentState.state === "WaitingForPlayers" ||
+          gameState.currentState.state === "EndRound") &&
         !myPlayer.startingPoint &&
         placingStartPiece
       ) {
-        dispatch(setPlayerInitialPoint(myPlayerId, placingStartPiece));
+        dispatch(setPlayerInitialPoint(myPlayer.id, placingStartPiece));
         setPlacingStartPiece(null);
       }
 
@@ -134,7 +133,8 @@ export default function Game({
     segment: typeof pointPairs[0];
   }) {
     if (
-      gameState.currentState.state === "WaitingForPlayers" &&
+      (gameState.currentState.state === "WaitingForPlayers" ||
+        gameState.currentState.state === "EndRound") &&
       myPlayer &&
       !myPlayer.startingPoint
     ) {
@@ -144,7 +144,7 @@ export default function Game({
       myPlayer &&
       gameState.currentState.state === "Turn" &&
       gameState.currentState.playerID === myPlayer.id &&
-      isSegmentReachable(gameState, [segment.from, segment.to], myPlayerId)
+      isSegmentReachable(gameState, [segment.from, segment.to], myPlayer.id)
     ) {
       if (segment.double && gameState.currentState.railsLeft >= 2) {
         setPlacingRailPath(segment);
@@ -167,10 +167,6 @@ export default function Game({
     dispatch(startGame());
   });
 
-  if (!myPlayer) {
-    return null;
-  }
-
   const myCities = myPlayer.targetCities.map(
     id => cities.find(city => city.name === id) as City
   );
@@ -181,9 +177,10 @@ export default function Game({
         <Toolbar>
           <Typography
             component="h1"
-            variant="h6"
+            variant="h5"
             color="inherit"
             noWrap
+            align="center"
             className={classes.title}
           >
             <StateDescription gameState={gameState} myPlayer={myPlayer} />
@@ -196,7 +193,7 @@ export default function Game({
         <div className={classes.container}>
           <div className={classes.gameMapContainer}>
             <GameBoard
-              startingPoints={
+              usersStartingPoints={
                 placingStartPiece
                   ? [
                       ...startingPoints,
@@ -208,9 +205,15 @@ export default function Game({
               placingPath={
                 placingRailPath && [placingRailPath.from, placingRailPath.to]
               }
+              winningState={
+                gameState.currentState.state === "EndRound" ||
+                gameState.currentState.state === "Finish"
+                  ? gameState.currentState
+                  : null
+              }
+              onClick={handleBoardClick}
               onMouseMove={handleBoardMouseMove}
               onMouseLeave={handleBoardMouseLeave}
-              onClick={handleBoardClick}
             />
           </div>
 

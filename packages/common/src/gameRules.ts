@@ -3,14 +3,17 @@
   They can be used to check an action validity in server and client.
 */
 
+import { v4 as uuid } from "uuid";
+
 import { GameState, BoardPoint, Player, TurnState } from "./gameStateTypes";
-import { maxPlayers, playerColorsArray } from "./config";
+import { maxPlayers, playerColorsArray, maxPenalityPoints } from "./config";
 import {
   dijkstra,
   vertexKey,
   compareTwoPoints,
   randomPick,
   comparePoints,
+  findMin,
 } from "./utils";
 import { points, City, cities, pointPairs, cityColorsArray } from "./map";
 import { GameStateAction } from "./gameStateActions";
@@ -40,8 +43,10 @@ export function findWinnerPlayers(state: GameState) {
 
 // How many pieces do we need for a given rail segment?
 export function calcNeededPieces(rail: [BoardPoint, BoardPoint]) {
-  const destinationPair = pointPairs.find(pair =>
-    compareTwoPoints([pair.from, pair.to], rail)
+  const destinationPair = pointPairs.find(
+    pair =>
+      compareTwoPoints([pair.from, pair.to], rail) ||
+      compareTwoPoints([pair.to, pair.from], rail)
   );
   if (!destinationPair) {
     // Should never happen but...
@@ -72,6 +77,18 @@ export function isSegmentReachable(
   return reachable;
 }
 
+// Gets random target cities for a new player, excluding the other player's one
+export function reshufflePlayerTargets(players: Player[]) {
+  // We simply choose the cities from the one no other players have
+  const freeCities = cities.filter(city =>
+    players.every(player => !player.targetCities.find(pc => pc === city.name))
+  );
+
+  return cityColorsArray.map(
+    color => randomPick(freeCities.filter(city => city.color === color)).name
+  );
+}
+
 // Creates a new player, populating the target cities
 // Return false if there is no more space
 export function createPlayer(
@@ -79,17 +96,12 @@ export function createPlayer(
   id: Player["id"],
   name: Player["name"]
 ) {
-  // We simply choose the cities from the one no other players have
-  const freeCities = cities.filter(city =>
-    state.players.every(
-      player => !player.targetCities.find(pc => pc === city.name)
-    )
-  );
+  const cities = reshufflePlayerTargets(state.players);
 
   // The next player color is in order
   const freeColor = playerColorsArray[state.players.length];
 
-  if (freeCities.length < cityColorsArray.length || !freeColor) {
+  if (cities.length < cityColorsArray.length || !freeColor) {
     // No free color or cities! The player cannot enter
     // "abbiam fatto le squadre prima..." (cit.)
     return false;
@@ -100,9 +112,7 @@ export function createPlayer(
     id,
     color: freeColor,
     penalityPoints: 0,
-    targetCities: cityColorsArray.map(
-      color => randomPick(freeCities.filter(city => city.color === color)).name
-    ),
+    targetCities: cities,
     startingPoint: null,
   };
 }
@@ -112,17 +122,68 @@ export function generateGameID() {
   return btoa(Math.round(Math.random() * 50000).toString());
 }
 
+// Generates a new valid player id
+export function generatePlayerID() {
+  return uuid();
+}
+
 // Which player has to start the turn?
 export function getInitialPlayerID(state: GameState) {
   return state.players[0].id;
 }
 
+// Is the player ko?
+export function isPlayerGameOver(player: Player): boolean {
+  return player.penalityPoints > maxPenalityPoints;
+}
+
 // Which player will do the next turn?
 export function getTurnNextPlayerID(state: GameState, turnState: TurnState) {
-  return state.players[
-    (state.players.findIndex(p => p.id === turnState.playerID) + 1) %
-      state.players.length
-  ].id;
+  const stillAlivePlayers = state.players.filter(
+    player => !isPlayerGameOver(player)
+  );
+  const currentPlayerIndex = stillAlivePlayers.findIndex(
+    p => p.id === turnState.playerID
+  );
+  const nextPlayer =
+    stillAlivePlayers[(currentPlayerIndex + 1) % stillAlivePlayers.length];
+  return nextPlayer.id;
+}
+
+export function calculateEndTurnPenalityPoints(
+  state: GameState,
+  player: Player
+): number {
+  const boardPairs = pointPairs.map<[BoardPoint, BoardPoint]>(pair => [
+    pair.from,
+    pair.to,
+  ]);
+  const playerTargetCities = player.targetCities.map(
+    name => cities.find(c => c.name === name) as City
+  );
+
+  const attachPoints = Array.from(
+    new Set(
+      state.board
+        .reduce((prev: BoardPoint[], e) => [...prev, ...e], [])
+        .map(vertexKey)
+    )
+  );
+
+  const minDistances = playerTargetCities.map(city => {
+    const { distances } = dijkstra(
+      points,
+      boardPairs,
+      city.position,
+      calcNeededPieces as any
+    );
+
+    const distancesToCluster = attachPoints.map(point => distances[point]);
+    const minDistance = findMin(distancesToCluster);
+    return minDistance;
+  });
+
+  return minDistances.reduce((a, b) => a + b, 0);
 }
 
 // The big game rules compliancy checker!
@@ -136,29 +197,11 @@ export function canPerformAction(
     case "ADD_PLAYER": {
       // Maximum of ${maxPlayers} players. Sorry!
       const alreadyExists = state.players.some(
-        player =>
-          player.id === action.player.id ||
-          player.name === action.player.name ||
-          player.color === action.player.color ||
-          player.targetCities.some(city =>
-            action.player.targetCities.find(c2 => c2 === city)
-          )
+        player => player.id === action.id || player.name === action.name
       );
-
-      // Very strong validation on this one
-      // It wouldn't be needed if generation were server side
-      const valid =
-        action.player.penalityPoints === 0 &&
-        action.player.targetCities.length === cityColorsArray.length &&
-        action.player.targetCities.every(city =>
-          cities.find(c2 => c2.name === city)
-        ) &&
-        action.player.color === playerColorsArray[state.players.length] &&
-        action.player.startingPoint === null;
 
       return (
         !alreadyExists &&
-        valid &&
         state.players.length + 1 < maxPlayers &&
         state.currentState.state === "WaitingForPlayers"
       );
@@ -200,7 +243,10 @@ export function canPerformAction(
 
     case "PLACE_RAIL": {
       // We must be in a turn
-      if (state.currentState.state !== "Turn") {
+      if (
+        state.currentState.state !== "Turn" ||
+        state.currentState.playerID !== playerID
+      ) {
         return false;
       }
 

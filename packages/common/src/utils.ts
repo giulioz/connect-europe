@@ -65,6 +65,15 @@ export function uniquePairs(pairs: [BoardPoint, BoardPoint][]) {
   );
 }
 
+export function findMin(arr: number[]) {
+  let min = Infinity;
+  arr.forEach(e => {
+    if (e < min) min = e;
+  });
+
+  return min;
+}
+
 export function vertexKey(vertex: BoardPoint) {
   return `${vertex[0]},${vertex[1]}`;
 }
@@ -93,7 +102,8 @@ export function neighs(vertex: BoardPoint, edges: [BoardPoint, BoardPoint][]) {
 export function dijkstra(
   vertices: BoardPoint[],
   edges: [BoardPoint, BoardPoint][],
-  startVertex: BoardPoint
+  startVertex: BoardPoint,
+  calcWeight: (p: [BoardPoint, BoardPoint]) => number = () => 1
 ) {
   const distances: { [key: string]: number } = {};
   const visitedVertices: { [key: string]: BoardPoint } = {};
@@ -116,7 +126,8 @@ export function dijkstra(
       if (!visitedVertices[vertexKey(neighbor)]) {
         const existingDistanceToNeighbor = distances[vertexKey(neighbor)];
         const distanceToNeighborFromCurrent =
-          distances[vertexKey(currentVertex)] + 1;
+          distances[vertexKey(currentVertex)] +
+          calcWeight([currentVertex, neighbor]);
 
         if (distanceToNeighborFromCurrent < existingDistanceToNeighbor) {
           distances[vertexKey(neighbor)] = distanceToNeighborFromCurrent;

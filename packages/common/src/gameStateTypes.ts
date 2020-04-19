@@ -17,7 +17,6 @@ export type BoardPoint = [number, number];
 export type GameState = {
   currentState: CurrentState;
   initiatorID: PlayerID | null;
-  lastWinnerID: PlayerID | null;
   players: Player[];
   board: [BoardPoint, BoardPoint][];
 };
@@ -38,6 +37,13 @@ export type TurnState = {
   railsLeft: number;
 };
 
+export type WinningState = {
+  winnerID: PlayerID;
+  targetCities: CityName[];
+  startingPoint: BoardPoint;
+  board: [BoardPoint, BoardPoint][];
+};
+
 export type CurrentState =
   // Game started: still waiting for the players to join
   // In the meantime, everybody sets his own starting point
@@ -48,7 +54,7 @@ export type CurrentState =
 
   // End of a game round, we calculate the penalityPoints and who has to quit
   // In the meantime, everyone sets his own starting point for the new round
-  | { state: "EndRound"; winnerID: PlayerID }
+  | ({ state: "EndRound" } & WinningState)
 
   // Game over! Adios and glory to the winner
-  | { state: "Finish"; winnerID: PlayerID };
+  | ({ state: "Finish" } & WinningState);

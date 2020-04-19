@@ -4,7 +4,32 @@ import { withParentSize } from "@vx/responsive";
 import { WithParentSizeProps } from "@vx/responsive/lib/enhancers/withParentSize";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { Player, points, cities, pointPairs } from "@trans-europa/common";
+import {
+  Player,
+  points,
+  cities,
+  pointPairs,
+  City,
+  BoardPoint,
+  WinningState,
+} from "@trans-europa/common";
+import RailLine from "./RailLine";
+import OffsettedLine from "./OffsettedLine";
+import {
+  calcPosInverse,
+  svgWidth,
+  svgHeight,
+  calcX,
+  calcY,
+  calcPos,
+  cityBulletSize,
+} from "../mapRenderConfig";
+import { calcDistancePointLine, calcDistancePointPoint } from "../utils";
+import {
+  dijkstra,
+  vertexKey,
+  compareTwoPoints,
+} from "@trans-europa/common/dist/utils";
 
 const useStyles = makeStyles(theme => ({
   gameBoardSvg: {
@@ -19,6 +44,7 @@ const useStyles = makeStyles(theme => ({
     fill: theme.palette.common.white,
     textAnchor: "middle",
     font: `20px sans-serif`,
+    userSelect: "none",
   },
   userRail: {
     filter: `drop-shadow(5px 2px 2px #ffffffaa)`,
@@ -28,213 +54,23 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const svgWidth = 1920;
-const svgHeight = 1227;
+type GameBoardProps = {
+  usersStartingPoints: { pos: BoardPoint; player: Player }[];
+  userPaths: [BoardPoint, BoardPoint][];
+  placingPath: [BoardPoint, BoardPoint] | null;
+  winningState: WinningState | null;
+  onClick(): void;
+  onMouseMove(out: { point: BoardPoint; segment: typeof pointPairs[0] }): void;
+  onMouseLeave(): void;
+} & WithParentSizeProps;
 
-const cellWidth = 47.5;
-const cellHeight = 84.5;
-
-function calcX(px: number) {
-  return px * cellWidth + 47.5;
-}
-function calcY(py: number) {
-  return py * cellHeight + 55;
-}
-function calcPos(px: number, py: number, offsetX = 0, offsetY = 0) {
-  return { x: calcX(px) + offsetX, y: calcY(py) + offsetY };
-}
-function calcPosInverse(px: number, py: number) {
-  const x = (px - 47.5) / cellWidth;
-  const y = (py - 55) / cellHeight;
-  return [x, y];
-}
-
-function calcDistancePointLine(
-  x: number,
-  y: number,
-  pair: [[number, number], [number, number]]
-) {
-  const dx = pair[1][0] - pair[0][0];
-  const dy = pair[1][1] - pair[0][1];
-  const l2 = dx * dx + dy * dy;
-
-  const t = ((x - pair[0][0]) * dx + (y - pair[0][1]) * dy) / l2;
-  const tNorm = Math.max(0, Math.min(1, t));
-
-  return (
-    (x - (pair[0][0] + tNorm * dx)) ** 2 + (y - (pair[0][1] + tNorm * dy)) ** 2
-  );
-}
-
-function calcDistancePointPoint(x: number, y: number, point: [number, number]) {
-  return (x - point[0]) ** 2 + (y - point[1]) ** 2;
-}
-
-const cityBulletSize = 60;
-
-function OffsettedLine({
-  x1,
-  x2,
-  y1,
-  y2,
-  offset = 0,
-  lengthOffset = 0,
-  startPiece = false,
-  endPiece = false,
-  piecesSize = 15,
-  ...rest
-}: React.SVGProps<SVGLineElement> & {
-  offset?: number;
-  lengthOffset?: number;
-  startPiece?: boolean;
-  endPiece?: boolean;
-  piecesSize?: number;
-}) {
-  const x1Parsed = x1 ? Number(x1) : 0;
-  const y1Parsed = y1 ? Number(y1) : 0;
-  const x2Parsed = x2 ? Number(x2) : 0;
-  const y2Parsed = y2 ? Number(y2) : 0;
-
-  const deltaX = x2Parsed - x1Parsed;
-  const deltaY = y2Parsed - y1Parsed;
-  const delta = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-  const cosine = deltaX / delta;
-  const sine = deltaY / delta;
-
-  if (deltaY === 0) {
-    return (
-      <line
-        x1={endPiece ? x2Parsed - piecesSize : x1Parsed + lengthOffset}
-        y1={y1Parsed - offset}
-        x2={startPiece ? x1Parsed + piecesSize : x2Parsed - lengthOffset}
-        y2={y2Parsed - offset}
-        {...rest}
-      />
-    );
-  } else {
-    if (startPiece) {
-      return (
-        <line
-          x1={x1Parsed}
-          y1={y1Parsed}
-          x2={x1Parsed + cosine * piecesSize}
-          y2={y1Parsed + sine * piecesSize}
-          {...rest}
-        />
-      );
-    } else if (endPiece) {
-      return (
-        <line
-          x1={x2Parsed}
-          y1={y2Parsed}
-          x2={x2Parsed - cosine * piecesSize}
-          y2={y2Parsed - sine * piecesSize}
-          {...rest}
-        />
-      );
-    } else {
-      return (
-        <line
-          x1={x1Parsed + offset * cosine + cosine * lengthOffset}
-          y1={y1Parsed - offset * sine + sine * lengthOffset}
-          x2={x2Parsed + offset * cosine - cosine * lengthOffset}
-          y2={y2Parsed - offset * sine - sine * lengthOffset}
-          {...rest}
-        />
-      );
-    }
-  }
-}
-
-function RailLine({
-  fromP,
-  toP,
-  double,
-  ...rest
-}: React.SVGProps<SVGLineElement> & {
-  fromP: [number, number];
-  toP: [number, number];
-  double: boolean;
-}) {
-  return double ? (
-    <>
-      <OffsettedLine
-        x1={calcX(fromP[0])}
-        y1={calcY(fromP[1])}
-        x2={calcX(toP[0])}
-        y2={calcY(toP[1])}
-        stroke="black"
-        strokeWidth={5}
-        startPiece
-        {...rest}
-        offset={0}
-      />
-      <OffsettedLine
-        stroke="black"
-        strokeWidth={5}
-        lengthOffset={20}
-        {...rest}
-        x1={calcX(fromP[0])}
-        y1={calcY(fromP[1])}
-        x2={calcX(toP[0])}
-        y2={calcY(toP[1])}
-        offset={5}
-      />
-      <OffsettedLine
-        stroke="black"
-        strokeWidth={5}
-        lengthOffset={20}
-        {...rest}
-        x1={calcX(fromP[0])}
-        y1={calcY(fromP[1])}
-        x2={calcX(toP[0])}
-        y2={calcY(toP[1])}
-        offset={-5}
-      />
-      <OffsettedLine
-        x1={calcX(fromP[0])}
-        y1={calcY(fromP[1])}
-        x2={calcX(toP[0])}
-        y2={calcY(toP[1])}
-        stroke="black"
-        strokeWidth={5}
-        endPiece
-        {...rest}
-        offset={0}
-      />
-    </>
-  ) : (
-    <OffsettedLine
-      stroke="black"
-      strokeWidth={5}
-      {...rest}
-      offset={0}
-      x1={calcX(fromP[0])}
-      y1={calcY(fromP[1])}
-      x2={calcX(toP[0])}
-      y2={calcY(toP[1])}
-    />
-  );
-}
-
-export default withParentSize<
-  {
-    startingPoints: { pos: [number, number]; player: Player }[];
-    userPaths: [[number, number], [number, number]][];
-    placingPath: [[number, number], [number, number]] | null;
-    onClick(): void;
-    onMouseMove(out: {
-      point: [number, number];
-      segment: typeof pointPairs[0];
-    }): void;
-    onMouseLeave(): void;
-  } & WithParentSizeProps
->(function GameBoard({
-  startingPoints,
+export default withParentSize<GameBoardProps>(function GameBoard({
   parentWidth,
   parentHeight,
+  usersStartingPoints,
   userPaths,
   placingPath,
+  winningState,
   onClick,
   onMouseMove,
   onMouseLeave,
@@ -271,6 +107,40 @@ export default withParentSize<
     });
   }
 
+  const winningCitiesPos = useAutoMemo(
+    winningState
+      ? winningState.targetCities
+          .map(wc => cities.find(c => c.name === wc) as City)
+          .map(c => c.position)
+      : null
+  );
+
+  const winningCitiesHighlighedPieces = useAutoMemo(() => {
+    if (!winningCitiesPos || !winningState) {
+      return null;
+    }
+
+    const { previousVertices } = dijkstra(
+      points,
+      userPaths,
+      winningState.startingPoint
+    );
+
+    const paths: [BoardPoint, BoardPoint][] = [];
+    function recurse(point: BoardPoint) {
+      const prev = previousVertices[vertexKey(point)];
+      if (prev) {
+        paths.push([point, prev]);
+        recurse(prev);
+      }
+    }
+    winningCitiesPos.forEach(cityPos => {
+      recurse(cityPos);
+    });
+
+    return paths;
+  });
+
   return (
     <svg
       ref={svgRef}
@@ -297,19 +167,31 @@ export default withParentSize<
         ))
       )}
 
-      {userPaths.map(([from, to]) => (
-        <OffsettedLine
-          key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
-          stroke="red"
-          strokeWidth={8}
-          lengthOffset={6}
-          x1={calcX(from[0])}
-          y1={calcY(from[1])}
-          x2={calcX(to[0])}
-          y2={calcY(to[1])}
-          className={classes.userRail}
-        />
-      ))}
+      {useAutoMemo(
+        userPaths.map(([from, to]) => {
+          const isWinningPiece =
+            winningCitiesHighlighedPieces &&
+            winningCitiesHighlighedPieces.find(
+              p =>
+                compareTwoPoints(p, [from, to]) ||
+                compareTwoPoints(p, [to, from])
+            );
+
+          return (
+            <OffsettedLine
+              key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
+              stroke={isWinningPiece ? "red" : "blue"}
+              strokeWidth={isWinningPiece ? 16 : 8}
+              lengthOffset={isWinningPiece ? 0 : 6}
+              x1={calcX(from[0])}
+              y1={calcY(from[1])}
+              x2={calcX(to[0])}
+              y2={calcY(to[1])}
+              className={classes.userRail}
+            />
+          );
+        })
+      )}
 
       {placingPath && (
         <OffsettedLine
@@ -354,26 +236,28 @@ export default withParentSize<
         ))
       )}
 
-      {startingPoints.map(({ pos: [x, y], player: { color, id } }) => (
-        <React.Fragment key={`startPoint-${x}-${y}-${id}`}>
-          <circle
-            cx={calcX(x)}
-            cy={calcY(y)}
-            fill={color}
-            opacity={1}
-            r={10}
-            className={classes.startPoint}
-          />
-          <circle
-            cx={calcX(x)}
-            cy={calcY(y)}
-            fill={color}
-            opacity={0.5}
-            r={14}
-            className={classes.startPoint}
-          />
-        </React.Fragment>
-      ))}
+      {useAutoMemo(
+        usersStartingPoints.map(({ pos: [x, y], player: { color, id } }) => (
+          <React.Fragment key={`startPoint-${x}-${y}-${id}`}>
+            <circle
+              cx={calcX(x)}
+              cy={calcY(y)}
+              fill={color}
+              opacity={1}
+              r={10}
+              className={classes.startPoint}
+            />
+            <circle
+              cx={calcX(x)}
+              cy={calcY(y)}
+              fill={color}
+              opacity={0.5}
+              r={14}
+              className={classes.startPoint}
+            />
+          </React.Fragment>
+        ))
+      )}
     </svg>
   );
 });

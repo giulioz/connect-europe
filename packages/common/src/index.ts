@@ -15,6 +15,7 @@ import {
   Player,
   PlayerColors,
   PlayerID,
+  WinningState,
 } from "./gameStateTypes";
 import {
   isSegmentReachable,
@@ -22,7 +23,7 @@ import {
   generateGameID,
   createPlayer,
 } from "./gameRules";
-import { playerColorsArray } from "./config";
+import { playerColorsArray, maxPenalityPoints } from "./config";
 import {
   cities,
   City,
@@ -60,6 +61,7 @@ export {
   generateGameID,
   initialGameState,
   isSegmentReachable,
+  maxPenalityPoints,
   ParamsType,
   placeRail,
   Player,
@@ -76,6 +78,7 @@ export {
   setState,
   sleep,
   startGame,
+  WinningState,
   withParameters,
   WSPayload,
 };

@@ -10,10 +10,11 @@ export const setState = (state: GameState) => ({
   state,
 });
 
-// Adds a new player and sets the initiator if null
-export const addPlayer = (player: Player) => ({
+// Create and adds a new player and sets the initiator if null
+export const addPlayer = (id: Player["id"], name: Player["name"]) => ({
   type: "ADD_PLAYER" as const,
-  player,
+  id,
+  name,
 });
 
 // Removes a player from the game by id

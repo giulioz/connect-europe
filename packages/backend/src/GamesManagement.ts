@@ -7,6 +7,7 @@ import {
   gameStateReducer,
   removePlayer,
   Player,
+  canPerformAction,
 } from "@trans-europa/common";
 
 // Creates a new redux store for a game
@@ -65,12 +66,24 @@ export default class GamesManagement {
   // Proxy for action dispatch
   handleDispatchAction(gameID: string, ws: WebSocket, action: GameStateAction) {
     // Ensure that the store exists
-    this.tryGetGameState(gameID);
+    const state = this.tryGetGameState(gameID);
 
     // We catch users actions to register the player websocket
     if (action.type === "ADD_PLAYER") {
-      this.usersWS[action.player.id] = { gameID, ws };
-    } else if (action.type === "REMOVE_PLAYER") {
+      this.usersWS[action.id] = { gameID, ws };
+    }
+
+    // Find the playerID associated with the websocket
+    const playerID = Object.keys(this.usersWS).find(
+      sws => this.usersWS[sws].ws === ws
+    );
+
+    if (playerID && canPerformAction(state, action, playerID)) {
+      // Dispatch the action to the store
+      this.games[gameID].dispatch(action);
+    }
+
+    if (action.type === "REMOVE_PLAYER") {
       // Checks if there are any players left, otherwise delete the game too
       const userGameID = this.usersWS[action.id].gameID;
       const gameState = this.games[userGameID]?.getState();
@@ -82,13 +95,10 @@ export default class GamesManagement {
       delete this.usersWS[action.id];
     }
 
-    // Dispatch the action to the store
-    this.games[gameID].dispatch(action);
-
     // Broadcasts the new state to everyone
-    const state = this.games[gameID]?.getState();
-    if (state) {
-      broadcastWS(state, state.players, this.usersWS);
+    const newState = this.games[gameID]?.getState();
+    if (newState) {
+      broadcastWS(newState, newState.players, this.usersWS);
     }
   }
 

@@ -10,7 +10,7 @@ import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import { orange, yellow, blue, green, red } from "@material-ui/core/colors";
 
-import { Player, City } from "@trans-europa/common";
+import { Player, City, maxPenalityPoints } from "@trans-europa/common";
 
 const useStyles = makeStyles(theme => ({
   listItem: {
@@ -88,13 +88,16 @@ export default function GameSidebar({
           key={player.id}
           className={classes.listItem}
           selected={player.id === playerTurnID}
+          disabled={player.penalityPoints > maxPenalityPoints}
         >
           <ListItemAvatar>
             <Avatar className={(classes as any)[`${player.color}Avatar`]}>
               {player.name.substr(0, 1).toUpperCase()}
             </Avatar>
           </ListItemAvatar>
-          <ListItemText>{player.name}</ListItemText>
+          <ListItemText>
+            {player.name} ({player.penalityPoints})
+          </ListItemText>
         </ListItem>
       ))}
 

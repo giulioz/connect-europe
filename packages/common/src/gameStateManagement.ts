@@ -3,7 +3,7 @@
   It takes the actions and calculate the new state.
 */
 
-import { GameState } from "./gameStateTypes";
+import { GameState, Player, BoardPoint } from "./gameStateTypes";
 import { GameStateAction } from "./gameStateActions";
 import { uniquePairs } from "./utils";
 import {
@@ -11,6 +11,10 @@ import {
   findWinnerPlayers,
   getInitialPlayerID,
   getTurnNextPlayerID,
+  createPlayer,
+  reshufflePlayerTargets,
+  calculateEndTurnPenalityPoints,
+  isPlayerGameOver,
 } from "./gameRules";
 import { defaultRailsLeft } from "./config";
 
@@ -18,7 +22,6 @@ import { defaultRailsLeft } from "./config";
 export const initialGameState: GameState = {
   currentState: { state: "WaitingForPlayers" },
   initiatorID: null,
-  lastWinnerID: null,
   players: [],
   board: [],
 };
@@ -33,12 +36,19 @@ export function gameStateReducer(
     case "SET_STATE":
       return action.state;
 
-    case "ADD_PLAYER":
+    case "ADD_PLAYER": {
+      // WARNING: This action is not pure, since it uses random
+      const player = createPlayer(state, action.id, action.name);
+      if (!player) {
+        return state;
+      }
+
       return {
         ...state,
-        initiatorID: !state.initiatorID ? action.player.id : state.initiatorID,
-        players: [...state.players, action.player],
+        initiatorID: !state.initiatorID ? player.id : state.initiatorID,
+        players: [...state.players, player],
       };
+    }
 
     case "REMOVE_PLAYER":
       return {
@@ -69,6 +79,7 @@ export function gameStateReducer(
     // Also advances the game state, checking for winning condition
     // This is the only reducer with more checks, so we can keep only one action for the turn advances
     case "PLACE_RAIL": {
+      // How many rail pieces we need?
       const neededPieces = calcNeededPieces(action.rail);
       if (neededPieces === false || state.currentState.state !== "Turn") {
         return state;
@@ -77,23 +88,24 @@ export function gameStateReducer(
       // Filters out possible duplicates
       const boardWithPlace = uniquePairs([...state.board, action.rail]);
 
+      // How will be the state after the place?
       const railsLeftAfterPlace = state.currentState.railsLeft - neededPieces;
-      const newTurnAfterPlace = railsLeftAfterPlace <= 0;
-
-      const gameStateAfterPlace = {
+      const nextTurnPlayerID = getTurnNextPlayerID(state, state.currentState);
+      const gameStateAfterPlace: GameState = {
         ...state,
-        currentState: newTurnAfterPlace
-          ? // No rails left: advance to the next player
-            {
-              ...state.currentState,
-              railsLeft: defaultRailsLeft,
-              playerID: getTurnNextPlayerID(state, state.currentState),
-            }
-          : // Subtract the rails left
-            {
-              ...state.currentState,
-              railsLeft: railsLeftAfterPlace,
-            },
+        currentState:
+          railsLeftAfterPlace <= 0
+            ? // No rails left: advance to the next player
+              {
+                ...state.currentState,
+                railsLeft: defaultRailsLeft,
+                playerID: nextTurnPlayerID,
+              }
+            : // Subtract the rails left
+              {
+                ...state.currentState,
+                railsLeft: railsLeftAfterPlace,
+              },
         board: boardWithPlace,
       };
 
@@ -103,19 +115,40 @@ export function gameStateReducer(
         // We take the first winner: there should be no way two players can win simultaneously
         const winner = winning[0];
 
-        // We reset the starting points when winning
-        const players = state.players.map(player => ({
-          ...player,
-          startingPoint: null,
-        }));
+        // We reset the starting points and targets when winning
+        // We also calculate the penalityPoints
+        const players = state.players.reduce(
+          (prev: Player[], player) => [
+            ...prev,
+            {
+              ...player,
+              startingPoint: null,
+              targetCities: reshufflePlayerTargets(prev),
+              penalityPoints: calculateEndTurnPenalityPoints(
+                gameStateAfterPlace,
+                player
+              ),
+            },
+          ],
+          []
+        );
+
+        // Game is finished if there is a single player left
+        const stillAlivePlayers = players.filter(
+          player => !isPlayerGameOver(player)
+        );
+        const isGameOver = stillAlivePlayers.length <= 1;
 
         return {
           ...gameStateAfterPlace,
+          board: [],
           players,
-          lastWinnerID: winner.id,
           currentState: {
-            state: "EndRound",
+            state: isGameOver ? "Finish" : "EndRound",
             winnerID: winner.id,
+            targetCities: winner.targetCities,
+            startingPoint: winner.startingPoint as BoardPoint,
+            board: gameStateAfterPlace.board,
           },
         };
       } else {

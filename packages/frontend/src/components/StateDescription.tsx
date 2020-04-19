@@ -12,12 +12,12 @@ export default function StateDescription({
     case "WaitingForPlayers":
       return (
         <>
-          {!myPlayer.startingPoint && <>Place your starting point. </>}
+          {!myPlayer.startingPoint && <>📌 Place your starting point. </>}
           {gameState.initiatorID === myPlayer.id && (
-            <>Press START GAME when everybody is ready.</>
+            <>▶️ Press START GAME when everybody is ready.</>
           )}
           {gameState.initiatorID !== myPlayer.id && myPlayer.startingPoint && (
-            <>Wait for the other players…</>
+            <>⏳ Wait for the other players…</>
           )}
         </>
       );
@@ -26,12 +26,12 @@ export default function StateDescription({
       if (gameState.currentState.playerID === myPlayer.id) {
         return (
           <>
-            It's your turn. You can place {gameState.currentState.railsLeft}{" "}
-            more rails.
+            ❕It's your turn. You can place {gameState.currentState.railsLeft}{" "}
+            more rails. 🛤
           </>
         );
       } else {
-        return <>Wait for your turn.</>;
+        return <>⏳ Wait for your turn.</>;
       }
 
     case "EndRound": {
@@ -43,17 +43,17 @@ export default function StateDescription({
         <>
           {winnerPlayer &&
             (gameState.currentState.winnerID === myPlayer.id ? (
-              <>You won this round! </>
+              <>You won this round! 🎉 </>
             ) : (
-              <>{winnerPlayer.name} won this round. </>
+              <>{winnerPlayer.name} won this round. 🙁</>
             ))}
-          Place your starting point for the next round.
+          📌 Place your starting point for the next round.
         </>
       );
     }
 
     case "Finish": {
-      const winnerID = gameState.lastWinnerID;
+      const winnerID = gameState.currentState.winnerID;
       const winnerPlayer = gameState.players.find(
         player => player.id === winnerID
       );
@@ -61,9 +61,9 @@ export default function StateDescription({
         <>
           {winnerPlayer &&
             (gameState.currentState.winnerID === myPlayer.id ? (
-              <>You won!</>
+              <>You won! 🎉 </>
             ) : (
-              <>{winnerPlayer.name} won.</>
+              <>{winnerPlayer.name} won. 🙁</>
             ))}
         </>
       );
