@@ -46,15 +46,14 @@ export default function IntroPage() {
             button below:
           </Typography>
           <pre>
-            {config.baseURL}
-            {roomId}
+            {config.baseURL}/{roomId}
           </pre>
           <Button
             variant="contained"
             color="primary"
             size="large"
             component={RouterLink}
-            to={`/${roomId}`}
+            to={`./${roomId}`}
           >
             Start Game
           </Button>

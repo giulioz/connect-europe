@@ -7,7 +7,7 @@ import WebSocket from "ws";
 
 import { WSPayload } from "@trans-europa/common";
 import ep from "./safeEndpoints";
-import GamesManagement from "./gamesManagement";
+import GamesManagement from "./GamesManagement";
 
 require("dotenv").config();
 const host = process.env.SERVER_HOST ? process.env.SERVER_HOST : "0.0.0.0";
