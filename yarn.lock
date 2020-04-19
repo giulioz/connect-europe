@@ -2890,6 +2890,7 @@ __metadata:
     lint-staged: ^10.0.8
     nodemon: ^2.0.2
     prettier: ^1.19.1
+    redux: ^4.0.5
     ts-jest: ^24.3.0
     ts-node: ^8.6.2
     typescript: ^3.8.3
@@ -2915,7 +2916,6 @@ __metadata:
     jest: ^24.9.0
     lint-staged: ^10.0.8
     prettier: ^1.19.1
-    redux: ^4.0.5
     ts-jest: ^24.3.0
     ts-node: ^8.6.2
     typescript: ^3.8.3
@@ -2953,7 +2953,6 @@ __metadata:
     react-spring: ^8.0.27
     serve: ^11.3.0
     typescript: ^3.8.3
-    uuid: ^7.0.3
   languageName: unknown
   linkType: soft
 
@@ -18001,15 +18000,6 @@ typescript@^3.8.3:
   bin:
     uuid: dist/bin/uuid
   checksum: 2/25137594ba74b0ca8bcf582f8c7c2e7556efe621d5cf2459d0c713755cb67c8546768b2d05c62d65a890a44e213551010f169cfa7c6ace4adcdd1bdfab22a627
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "uuid@npm:7.0.3"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 2/a56be8a5bbf2bae755d749d0693637274935b5ae250dfaaaf79241391cf1a7c142a202492196363ec62ec51a476e5e3fc4de2944d854abf2e9b35a33e0e31d4c
   languageName: node
   linkType: hard
 

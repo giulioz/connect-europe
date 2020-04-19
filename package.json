@@ -16,7 +16,7 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "start": "concurrently --kill-others \"npm run start-frontend\" \"npm run start-backend\"",
+    "start": "npm run start-backend",
     "start-frontend": "lerna run start --scope @trans-europa/frontend",
     "start-backend": "lerna run start --scope @trans-europa/backend",
     "dev": "concurrently --kill-others \"npm run dev-frontend\" \"npm run dev-backend\" \"npm run dev-common\"",
