@@ -124,10 +124,9 @@ export function gameStateReducer(
               ...player,
               startingPoint: null,
               targetCities: reshufflePlayerTargets(prev),
-              penalityPoints: calculateEndTurnPenalityPoints(
-                gameStateAfterPlace,
-                player
-              ),
+              penalityPoints:
+                player.penalityPoints +
+                calculateEndTurnPenalityPoints(gameStateAfterPlace, player),
             },
           ],
           []

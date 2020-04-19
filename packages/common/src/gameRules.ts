@@ -202,7 +202,7 @@ export function canPerformAction(
 
       return (
         !alreadyExists &&
-        state.players.length + 1 < maxPlayers &&
+        state.players.length + 1 <= maxPlayers &&
         state.currentState.state === "WaitingForPlayers"
       );
     }

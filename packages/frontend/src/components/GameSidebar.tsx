@@ -59,6 +59,10 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.getContrastText(yellow[500]),
     backgroundColor: yellow[500],
   },
+  oliveAvatar: {
+    color: theme.palette.getContrastText("#808000"),
+    backgroundColor: "#808000",
+  },
 }));
 
 export default function GameSidebar({

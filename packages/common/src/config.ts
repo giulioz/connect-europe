@@ -8,6 +8,7 @@ export const playerColorsArray: PlayerColors[] = [
   "orange",
   "yellow",
   "purple",
+  "olive",
 ];
 
 // Since we assign a color for each player...

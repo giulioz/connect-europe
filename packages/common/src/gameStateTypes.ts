@@ -9,7 +9,8 @@ export type PlayerColors =
   | "green"
   | "orange"
   | "yellow"
-  | "purple";
+  | "purple"
+  | "olive";
 
 export type CityName = string;
 export type BoardPoint = [number, number];

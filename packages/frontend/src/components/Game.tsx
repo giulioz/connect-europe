@@ -230,7 +230,7 @@ export default function Game({
             isInitiator={myPlayer.id === gameState.initiatorID}
             startDisabled={
               myPlayer.id !== gameState.initiatorID ||
-              gameState.currentState.state !== "WaitingForPlayers" ||
+              gameState.currentState.state == "Turn" ||
               !everybodyHasStartingPoint
             }
           />
