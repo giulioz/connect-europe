@@ -1,5 +1,5 @@
 export default {
-  baseURL: "https://" + window.location.host + "/",
+  baseURL: "https://" + window.location.host,
   apiURL: "",
-  wsURL: "ws://" + window.location.host + "/",
+  wsURL: "wss://" + window.location.host + "/",
 };
