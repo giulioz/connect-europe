@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "author": "Giulio Zausa <mail.zausa.giulio@gmail.com>",
   "license": "MIT",
+  "proxy": "http://localhost:8080",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/giulioz/connect-europe.git"

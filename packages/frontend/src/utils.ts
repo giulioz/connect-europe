@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export function useTimeout(timeout: number) {
   const [value, setValue] = useState<boolean>(false);

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useAutoMemo } from "hooks.macro";
 import { withParentSize } from "@vx/responsive";
 import { WithParentSizeProps } from "@vx/responsive/lib/enhancers/withParentSize";
