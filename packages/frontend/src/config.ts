@@ -1,5 +1,5 @@
 export default {
-  baseURL: "http://gzausa.hopto.org:8081",
+  baseURL: "https://" + window.location.host + "/",
   apiURL: "",
   wsURL: "ws://" + window.location.host + "/",
 };
