@@ -23,7 +23,7 @@
     "dev-frontend": "lerna run dev --scope @connect-europe/frontend",
     "dev-backend": "lerna run dev --scope @connect-europe/backend",
     "dev-common": "lerna run dev --scope @connect-europe/common",
-    "build": "yarn build-common; concurrently \"yarn build-backend\" \"yarn build-frontend\"",
+    "build": "yarn build-common && concurrently \"yarn build-backend\" \"yarn build-frontend\"",
     "build-backend": "lerna run build --scope @connect-europe/backend",
     "build-common": "lerna run build --scope @connect-europe/common",
     "build-frontend": "lerna run build --scope @connect-europe/frontend",
