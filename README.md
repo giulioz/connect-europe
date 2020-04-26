@@ -1,5 +1,9 @@
 # connect-europe
 
+An online multiplayer board game, connect your cities before your friends does.
+
+![screenshoot](docs/game-screenshoot.png)
+
 This project uses Lerna. There are two packages:
 
 - `common`: common code for frontend and backend, contains shared types and game logic,
@@ -11,7 +15,7 @@ This project uses Lerna. There are two packages:
 Please use [`yarn`](https://classic.yarnpkg.com/en/docs/getting-started) to manage packages and dependencies.
 
 - `yarn dev`: runs the backend and the frontend concurrently, in development live-reload mode,
-- `yarn dev-frontend`: runs the frontend, in development live-reload mode,
-- `yarn dev-backend`: runs the backend, in development live-reload mode.
+- `yarn build`: builds everything,
+- `yarn start`: runs the backend in production mode.
 
 You can find package specific scripts in the packages readme.
