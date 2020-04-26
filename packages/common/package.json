@@ -1,14 +1,14 @@
 {
-  "name": "@trans-europa/common",
+  "name": "@connect-europe/common",
   "version": "1.0.0",
   "author": "Giulio Zausa <mail.zausa.giulio@gmail.com>",
-  "homepage": "https://github.com/giulioz/trans-europa#readme",
+  "homepage": "https://github.com/giulioz/connect-europe#readme",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/giulioz/trans-europa.git"
+    "url": "git+https://github.com/giulioz/connect-europe.git"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",

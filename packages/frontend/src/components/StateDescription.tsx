@@ -1,5 +1,5 @@
 import React from "react";
-import { GameState, Player } from "@trans-europa/common";
+import { GameState, Player } from "@connect-europe/common";
 
 export default function StateDescription({
   gameState,

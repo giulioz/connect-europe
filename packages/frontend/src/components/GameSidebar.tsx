@@ -10,7 +10,7 @@ import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import { orange, yellow, blue, green, red } from "@material-ui/core/colors";
 
-import { Player, City, maxPenalityPoints } from "@trans-europa/common";
+import { Player, City, maxPenalityPoints } from "@connect-europe/common";
 
 const useStyles = makeStyles(theme => ({
   listItem: {

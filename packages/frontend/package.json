@@ -1,11 +1,11 @@
 {
-  "name": "@trans-europa/frontend",
+  "name": "@connect-europe/frontend",
   "version": "1.0.0",
   "author": "Giulio Zausa <mail.zausa.giulio@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/giulioz/trans-europa.git"
+    "url": "git+https://github.com/giulioz/connect-europe.git"
   },
   "scripts": {
     "start": "serve -s build",
@@ -16,10 +16,10 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
+    "@connect-europe/common": "^1.0.0",
     "@material-ui/core": "^4.9.5",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.46",
-    "@trans-europa/common": "^1.0.0",
     "@vx/responsive": "^0.0.195",
     "clsx": "^1.1.0",
     "hooks.macro": "^1.1.1",

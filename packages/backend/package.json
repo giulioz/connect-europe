@@ -1,15 +1,15 @@
 {
-  "name": "@trans-europa/backend",
+  "name": "@connect-europe/backend",
   "version": "1.0.0",
   "author": "Giulio Zausa <mail.zausa.giulio@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/giulioz/trans-europa.git"
+    "url": "git+https://github.com/giulioz/connect-europe.git"
   },
   "dependencies": {
-    "@trans-europa/common": "^1.0.0",
+    "@connect-europe/common": "^1.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

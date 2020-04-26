@@ -17,7 +17,7 @@ import {
   isSegmentReachable,
   setPlayerInitialPoint,
   placeRail,
-} from "@trans-europa/common";
+} from "@connect-europe/common";
 
 import GameBoard from "../components/GameBoard";
 import GameSidebar from "../components/GameSidebar";

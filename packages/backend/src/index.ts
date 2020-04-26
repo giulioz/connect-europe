@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import WebSocket from "ws";
 
-import { WSPayload } from "@trans-europa/common";
+import { WSPayload } from "@connect-europe/common";
 import ep from "./safeEndpoints";
 import GamesManagement from "./GamesManagement";
 

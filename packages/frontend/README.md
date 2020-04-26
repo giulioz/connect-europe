@@ -1,4 +1,4 @@
-# @trans-europa/frontend
+# @connect-europe/frontend
 
 Web interface for the game, written with React and TypeScript.
 

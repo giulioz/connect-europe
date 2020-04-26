@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import TrainIcon from "@material-ui/icons/Train";
 
-import { generateGameID } from "@trans-europa/common";
+import { generateGameID } from "@connect-europe/common";
 import Layout from "../components/Layout";
 import config from "../config";
 
@@ -39,7 +39,7 @@ export default function IntroPage() {
         <Container maxWidth="lg" className={classes.container}>
           <Typography variant="h1" gutterBottom>
             <TrainIcon fontSize="inherit" className={classes.trainIcon} />
-            Trans Europa
+            Connect Europe
           </Typography>
           <Typography gutterBottom>
             To start a new game send this link to your friends and press the

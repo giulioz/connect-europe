@@ -8,7 +8,7 @@ import {
   GameState,
   GameStateAction,
   WSPayload,
-} from "@trans-europa/common";
+} from "@connect-europe/common";
 import apiCall from "./apiCall";
 import config from "../config";
 

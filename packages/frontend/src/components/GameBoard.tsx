@@ -12,7 +12,7 @@ import {
   City,
   BoardPoint,
   WinningState,
-} from "@trans-europa/common";
+} from "@connect-europe/common";
 import RailLine from "./RailLine";
 import OffsettedLine from "./OffsettedLine";
 import {
@@ -33,7 +33,7 @@ import {
   dijkstra,
   vertexKey,
   compareTwoPoints,
-} from "@trans-europa/common/dist/utils";
+} from "@connect-europe/common/dist/utils";
 
 const useStyles = makeStyles(theme => ({
   gameBoardSvg: {

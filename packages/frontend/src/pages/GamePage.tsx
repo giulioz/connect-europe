@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAutoMemo } from "hooks.macro";
 
-import { addPlayer, generatePlayerID } from "@trans-europa/common";
+import { addPlayer, generatePlayerID } from "@connect-europe/common";
 
 import Layout from "../components/Layout";
 import NameInsertDialog from "../components/NameInsertDialog";

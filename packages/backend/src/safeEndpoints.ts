@@ -1,12 +1,12 @@
 import express from "express";
 /* eslint-disable-next-line import/no-unresolved */
 import { RequestHandler } from "express-serve-static-core";
-import { Endpoints } from "@trans-europa/common";
+import { Endpoints } from "@connect-europe/common";
 import {
   ParamsType,
   ResType,
   ReqType,
-} from "@trans-europa/common/src/utils";
+} from "@connect-europe/common/src/utils";
 
 export default function safeEndpoint<K extends keyof Endpoints>(
   app: ReturnType<typeof express>,

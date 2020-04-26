@@ -4,7 +4,7 @@ import {
   ParamsType,
   ResType,
   ReqType,
-} from "@trans-europa/common";
+} from "@connect-europe/common";
 import config from "../config";
 
 export default async function apiCall<K extends keyof Endpoints>(

@@ -1,4 +1,4 @@
-# trans-europa
+# connect-europe
 
 This project uses Lerna. There are two packages:
 

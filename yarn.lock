@@ -1311,6 +1311,102 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@connect-europe/backend@workspace:packages/backend":
+  version: 0.0.0-use.local
+  resolution: "@connect-europe/backend@workspace:packages/backend"
+  dependencies:
+    "@connect-europe/common": ^1.0.0
+    "@types/body-parser": ^1.19.0
+    "@types/cors": ^2.8.6
+    "@types/express": ^4.17.3
+    "@types/express-serve-static-core": ^4.17.3
+    "@types/jest": ^25.1.4
+    "@types/node": ^13.9.5
+    "@types/node-fetch": ^2.5.5
+    "@types/ws": ^7.2.4
+    "@typescript-eslint/eslint-plugin": ^2.25.0
+    "@typescript-eslint/parser": ^2.25.0
+    body-parser: ^1.19.0
+    concurrently: ^5.1.0
+    cors: ^2.8.5
+    dotenv: ^8.2.0
+    eslint: ^6.8.0
+    eslint-config-airbnb-base: ^14.1.0
+    eslint-config-prettier: ^6.8.0
+    eslint-import-resolver-node: ^0.3.3
+    eslint-plugin-import: ^2.20.1
+    eslint-plugin-prettier: ^3.1.2
+    express: ^4.17.1
+    jest: ^24.9.0
+    lint-staged: ^10.0.8
+    nodemon: ^2.0.2
+    prettier: ^1.19.1
+    redux: ^4.0.5
+    ts-jest: ^24.3.0
+    ts-node: ^8.6.2
+    typescript: ^3.8.3
+    ws: ^7.2.3
+  languageName: unknown
+  linkType: soft
+
+"@connect-europe/common@^1.0.0, @connect-europe/common@workspace:packages/common":
+  version: 0.0.0-use.local
+  resolution: "@connect-europe/common@workspace:packages/common"
+  dependencies:
+    "@types/jest": ^25.1.4
+    "@types/node": ^13.9.5
+    "@types/uuid": ^7.0.0
+    "@typescript-eslint/eslint-plugin": ^2.25.0
+    "@typescript-eslint/parser": ^2.25.0
+    eslint: ^6.8.0
+    eslint-config-airbnb-base: ^14.1.0
+    eslint-config-prettier: ^6.8.0
+    eslint-import-resolver-node: ^0.3.3
+    eslint-plugin-import: ^2.20.1
+    eslint-plugin-prettier: ^3.1.2
+    jest: ^24.9.0
+    lint-staged: ^10.0.8
+    prettier: ^1.19.1
+    ts-jest: ^24.3.0
+    ts-node: ^8.6.2
+    typescript: ^3.8.3
+    uuid: ^7.0.2
+  languageName: unknown
+  linkType: soft
+
+"@connect-europe/frontend@workspace:packages/frontend":
+  version: 0.0.0-use.local
+  resolution: "@connect-europe/frontend@workspace:packages/frontend"
+  dependencies:
+    "@connect-europe/common": ^1.0.0
+    "@material-ui/core": ^4.9.5
+    "@material-ui/icons": ^4.9.1
+    "@material-ui/lab": ^4.0.0-alpha.46
+    "@types/react": ^16.9.23
+    "@types/react-dom": ^16.9.5
+    "@types/react-router-dom": ^5.1.3
+    "@typescript-eslint/eslint-plugin": ^2.25.0
+    "@typescript-eslint/parser": ^2.25.0
+    "@vx/responsive": ^0.0.195
+    clsx: ^1.1.0
+    eslint: ^6.8.0
+    eslint-config-prettier: ^6.8.0
+    eslint-config-react-app: ^5.2.1
+    eslint-import-resolver-node: ^0.3.3
+    eslint-plugin-prettier: ^3.1.2
+    hooks.macro: ^1.1.1
+    lint-staged: ^10.0.8
+    prettier: ^1.19.1
+    react: ^16.13.0
+    react-dom: ^16.13.0
+    react-router-dom: ^5.1.2
+    react-scripts: ^3.4.1
+    react-spring: ^8.0.27
+    serve: ^11.3.0
+    typescript: ^3.8.3
+  languageName: unknown
+  linkType: soft
+
 "@csstools/convert-colors@npm:^1.4.0":
   version: 1.4.0
   resolution: "@csstools/convert-colors@npm:1.4.0"
@@ -2859,102 +2955,6 @@ __metadata:
   checksum: 2/160f2805c5c1173c71908c26b03f3f832ba8024c1146e2945b94e94d85c6874a4b521f3417d4542d45141f29f4d1fbea07b54960d03c23aae46730c27380e278
   languageName: node
   linkType: hard
-
-"@trans-europa/backend@workspace:packages/backend":
-  version: 0.0.0-use.local
-  resolution: "@trans-europa/backend@workspace:packages/backend"
-  dependencies:
-    "@trans-europa/common": ^1.0.0
-    "@types/body-parser": ^1.19.0
-    "@types/cors": ^2.8.6
-    "@types/express": ^4.17.3
-    "@types/express-serve-static-core": ^4.17.3
-    "@types/jest": ^25.1.4
-    "@types/node": ^13.9.5
-    "@types/node-fetch": ^2.5.5
-    "@types/ws": ^7.2.4
-    "@typescript-eslint/eslint-plugin": ^2.25.0
-    "@typescript-eslint/parser": ^2.25.0
-    body-parser: ^1.19.0
-    concurrently: ^5.1.0
-    cors: ^2.8.5
-    dotenv: ^8.2.0
-    eslint: ^6.8.0
-    eslint-config-airbnb-base: ^14.1.0
-    eslint-config-prettier: ^6.8.0
-    eslint-import-resolver-node: ^0.3.3
-    eslint-plugin-import: ^2.20.1
-    eslint-plugin-prettier: ^3.1.2
-    express: ^4.17.1
-    jest: ^24.9.0
-    lint-staged: ^10.0.8
-    nodemon: ^2.0.2
-    prettier: ^1.19.1
-    redux: ^4.0.5
-    ts-jest: ^24.3.0
-    ts-node: ^8.6.2
-    typescript: ^3.8.3
-    ws: ^7.2.3
-  languageName: unknown
-  linkType: soft
-
-"@trans-europa/common@^1.0.0, @trans-europa/common@workspace:packages/common":
-  version: 0.0.0-use.local
-  resolution: "@trans-europa/common@workspace:packages/common"
-  dependencies:
-    "@types/jest": ^25.1.4
-    "@types/node": ^13.9.5
-    "@types/uuid": ^7.0.0
-    "@typescript-eslint/eslint-plugin": ^2.25.0
-    "@typescript-eslint/parser": ^2.25.0
-    eslint: ^6.8.0
-    eslint-config-airbnb-base: ^14.1.0
-    eslint-config-prettier: ^6.8.0
-    eslint-import-resolver-node: ^0.3.3
-    eslint-plugin-import: ^2.20.1
-    eslint-plugin-prettier: ^3.1.2
-    jest: ^24.9.0
-    lint-staged: ^10.0.8
-    prettier: ^1.19.1
-    ts-jest: ^24.3.0
-    ts-node: ^8.6.2
-    typescript: ^3.8.3
-    uuid: ^7.0.2
-  languageName: unknown
-  linkType: soft
-
-"@trans-europa/frontend@workspace:packages/frontend":
-  version: 0.0.0-use.local
-  resolution: "@trans-europa/frontend@workspace:packages/frontend"
-  dependencies:
-    "@material-ui/core": ^4.9.5
-    "@material-ui/icons": ^4.9.1
-    "@material-ui/lab": ^4.0.0-alpha.46
-    "@trans-europa/common": ^1.0.0
-    "@types/react": ^16.9.23
-    "@types/react-dom": ^16.9.5
-    "@types/react-router-dom": ^5.1.3
-    "@typescript-eslint/eslint-plugin": ^2.25.0
-    "@typescript-eslint/parser": ^2.25.0
-    "@vx/responsive": ^0.0.195
-    clsx: ^1.1.0
-    eslint: ^6.8.0
-    eslint-config-prettier: ^6.8.0
-    eslint-config-react-app: ^5.2.1
-    eslint-import-resolver-node: ^0.3.3
-    eslint-plugin-prettier: ^3.1.2
-    hooks.macro: ^1.1.1
-    lint-staged: ^10.0.8
-    prettier: ^1.19.1
-    react: ^16.13.0
-    react-dom: ^16.13.0
-    react-router-dom: ^5.1.2
-    react-scripts: ^3.4.1
-    react-spring: ^8.0.27
-    serve: ^11.3.0
-    typescript: ^3.8.3
-  languageName: unknown
-  linkType: soft
 
 "@types/babel__core@npm:^7.1.0":
   version: 7.1.6
@@ -5705,6 +5705,20 @@ __metadata:
   checksum: 2/319e6d15384745d3ff4a5ca0357b687e0d36a1ab29a03084e192ea12802532de0fa7319169b09e971aba6a291f8a5ca333105e0fb239ed3f6c891f13eea2bea6
   languageName: node
   linkType: hard
+
+"connect-europe@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "connect-europe@workspace:."
+  dependencies:
+    "@yarnpkg/pnpify": ^2.0.0-rc.20
+    concurrently: ^5.1.0
+    eslint: ^6.8.0
+    husky: ^4.2.3
+    lerna: ^3.20.2
+    prettier: ^1.19.1
+    typescript: ^3.8.3
+  languageName: unknown
+  linkType: soft
 
 "connect-history-api-fallback@npm:^1.6.0":
   version: 1.6.0
@@ -17437,20 +17451,6 @@ resolve@1.15.0:
   checksum: 2/66e2e4d6799d3c2fcc56ad6084e8ab7b3e744f138babc86100e5e2bfaf011231d00d229cfccfaf338da953b96c3ea9128d182274915c1516c5189ee75b7c0ad9
   languageName: node
   linkType: hard
-
-"trans-europa@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "trans-europa@workspace:."
-  dependencies:
-    "@yarnpkg/pnpify": ^2.0.0-rc.20
-    concurrently: ^5.1.0
-    eslint: ^6.8.0
-    husky: ^4.2.3
-    lerna: ^3.20.2
-    prettier: ^1.19.1
-    typescript: ^3.8.3
-  languageName: unknown
-  linkType: soft
 
 "tree-kill@npm:^1.2.2":
   version: 1.2.2

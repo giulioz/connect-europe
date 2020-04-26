@@ -8,7 +8,7 @@ import {
   removePlayer,
   Player,
   canPerformAction,
-} from "@trans-europa/common";
+} from "@connect-europe/common";
 
 // Creates a new redux store for a game
 function initState() {

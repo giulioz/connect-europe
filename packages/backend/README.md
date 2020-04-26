@@ -1,4 +1,4 @@
-# @trans-europa/frontend
+# @connect-europe/frontend
 
 Game backend, written with Node.JS, Express and TypeScript
 
