@@ -19,3 +19,10 @@ Please use [`yarn`](https://classic.yarnpkg.com/en/docs/getting-started) to mana
 - `yarn start`: runs the backend in production mode.
 
 You can find package specific scripts in the packages readme.
+
+## Acknowledgements
+
+Many thanks to:
+
+- Sandro Baccega, for his CSS Grid mastery
+- Giacomo Centazzo, for the design of the board
