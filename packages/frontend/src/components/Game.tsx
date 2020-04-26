@@ -66,7 +66,7 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column",
     flexWrap: "wrap",
-    overflow: "hidden",
+    overflow: "scroll",
   },
 }));
 
