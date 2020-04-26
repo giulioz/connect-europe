@@ -24,5 +24,5 @@ You can find package specific scripts in the packages readme.
 
 Many thanks to:
 
-- Sandro Baccega, for his CSS Grid mastery
+- [Sandro Baccega](https://github.com/Baccega), for his CSS Grid mastery
 - Giacomo Centazzo, for the design of the board
