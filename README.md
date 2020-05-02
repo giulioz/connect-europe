@@ -1,5 +1,7 @@
 # connect-europe
 
+[![DeepScan grade](https://deepscan.io/api/teams/8864/projects/11086/branches/160889/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=8864&pid=11086&bid=160889)
+
 An online multiplayer board game, connect your cities before your friends does.
 
 ![screenshoot](docs/game-screenshoot.png)
