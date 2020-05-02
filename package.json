@@ -30,7 +30,8 @@
     "docker-build": "docker build -t connect-europe .",
     "docker-run": "npm run docker-build && docker-compose up",
     "format": "lerna run format",
-    "lint": "lerna run lint"
+    "lint": "lerna run lint",
+    "test": "lerna run test"
   },
   "husky": {
     "hooks": {
