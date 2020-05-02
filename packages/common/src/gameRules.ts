@@ -119,7 +119,9 @@ export function createPlayer(
 
 // Generates a new valid game id
 export function generateGameID() {
-  return btoa(Math.round(Math.random() * 50000).toString());
+  return Buffer.from(Math.round(Math.random() * 50000).toString()).toString(
+    "base64"
+  );
 }
 
 // Generates a new valid player id

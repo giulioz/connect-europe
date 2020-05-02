@@ -1,7 +1,7 @@
 /*
   All the types that are needed as envelopes for transport, both REST and WebSocket.
   If we type every message that we exchange, we won't need to validate the schema!
-  (...maybe)
+  (...hopefully)
 */
 
 import { GameState } from "./gameStateTypes";
@@ -20,6 +20,11 @@ export interface Endpoints {
   "GET /state/:gameID": {
     params: { gameID: string };
     res: ResponseStatus<GameState>;
+    req: null;
+  };
+  "GET /newGameID": {
+    params: {};
+    res: ResponseStatus<string>;
     req: null;
   };
 }

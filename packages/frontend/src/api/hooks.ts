@@ -12,6 +12,8 @@ import {
 import apiCall from "./apiCall";
 import config from "../config";
 
+const emptyParams = {};
+
 export function useRemoteData<K extends keyof Endpoints>(
   endpoint: K,
   params: ParamsType<K>
@@ -31,6 +33,12 @@ export function useRemoteData<K extends keyof Endpoints>(
   }, [endpoint, params]);
 
   return data;
+}
+
+export function useNewGameID() {
+  const res = useRemoteData("GET /newGameID", emptyParams);
+
+  return res && res?.status === "ok" ? res.data : false;
 }
 
 export function useRemoteState(

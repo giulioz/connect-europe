@@ -1,12 +1,13 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import TrainIcon from "@material-ui/icons/Train";
 
-import { generateGameID } from "@connect-europe/common";
+import { useNewGameID } from "../api/hooks";
 import Layout from "../components/Layout";
 import config from "../config";
 
@@ -30,7 +31,7 @@ const useStyles = makeStyles(theme => ({
 export default function IntroPage() {
   const classes = useStyles();
 
-  const roomId = generateGameID();
+  const roomId = useNewGameID();
 
   return (
     <Layout>
@@ -41,22 +42,28 @@ export default function IntroPage() {
             <TrainIcon fontSize="inherit" className={classes.trainIcon} />
             Connect Europe
           </Typography>
-          <Typography gutterBottom>
-            To start a new game send this link to your friends and press the
-            button below:
-          </Typography>
-          <pre>
-            {config.baseURL}/{roomId}
-          </pre>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            component={RouterLink}
-            to={`./${roomId}`}
-          >
-            Start Game
-          </Button>
+          {roomId ? (
+            <>
+              <Typography gutterBottom>
+                To start a new game send this link to your friends and press the
+                button below:
+              </Typography>
+              <pre>
+                {config.baseURL}/{roomId}
+              </pre>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                component={RouterLink}
+                to={`./${roomId}`}
+              >
+                Start Game
+              </Button>
+            </>
+          ) : (
+            <CircularProgress />
+          )}
         </Container>
       </main>
     </Layout>
