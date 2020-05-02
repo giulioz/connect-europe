@@ -38,7 +38,7 @@ export function useRemoteData<K extends keyof Endpoints>(
 export function useNewGameID() {
   const res = useRemoteData("GET /newGameID", emptyParams);
 
-  return res && res?.status === "ok" ? res.data : false;
+  return res?.status === "ok" ? res.data : false;
 }
 
 export function useRemoteState(
