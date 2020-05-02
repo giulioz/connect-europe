@@ -203,9 +203,9 @@ export default withParentSize<GameBoardProps>(function GameBoard({
             (isWinningPiece && (
               <OffsettedLine
                 key={`USER-${from[0]},${from[1]}-${to[0]},${to[1]}`}
-                stroke={isWinningPiece ? "red" : "blue"}
-                strokeWidth={isWinningPiece ? 16 : 8}
-                lengthOffset={isWinningPiece ? 0 : 6}
+                stroke={"red"}
+                strokeWidth={16}
+                lengthOffset={0}
                 x1={calcX(from[0])}
                 y1={calcY(from[1])}
                 x2={calcX(to[0])}
